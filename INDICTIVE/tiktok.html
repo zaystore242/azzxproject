@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TikTok Downloader - Tokatsu</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-purple: #8A2BE2;
+            --secondary-purple: #4c1d95;
+            --accent-cyan: #00f3ff;
+            --glass-bg: rgba(20, 20, 30, 0.7);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --sidebar-width: 280px; /* Sedikit dikecilkan agar pas di HP kecil */
+            --header-height: 70px;
+            --nav-height: 70px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Rajdhani', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
+        }
+
+        body {
+            background-color: #050505;
+            min-height: 100vh;
+            /* Latar belakang tetap ada untuk mode Desktop */
+            background: radial-gradient(circle at 50% 20%, #1a0b2e 0%, #000 60%);
+            background-size: 200% 200%;
+            animation: bgPulse 10s ease infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center; /* Center vertikal hanya di desktop */
+            overflow: hidden; /* Mencegah scroll pada body utama */
+        }
+
+        @keyframes bgPulse {
+            0% { background-position: 50% 0%; }
+            50% { background-position: 50% 20%; }
+            100% { background-position: 50% 0%; }
+        }
+
+        /* --- CONTAINER UTAMA (RESPONSIVE FIX) --- */
+        .app-container {
+            width: 100%;
+            height: 100vh; /* Fallback */
+            height: 100dvh; /* Dynamic Viewport Height untuk Mobile modern */
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            color: white;
+            background: rgba(0, 0, 0, 0.9); /* Latar lebih gelap agar konten terbaca */
+            overflow: hidden;
+        }
+
+        /* Mode Desktop/Tablet (> 768px) */
+        @media (min-width: 768px) {
+            .app-container {
+                width: 400px; /* Lebar tetap seperti HP */
+                height: 85vh;
+                max-height: 900px;
+                border-radius: 30px;
+                border: 1px solid rgba(255, 255, 255, 0.15);
+                box-shadow: 0 0 50px rgba(138, 43, 226, 0.25);
+                background: rgba(10, 10, 15, 0.95);
+            }
+            
+            /* Scrollbar custom untuk desktop */
+            .main-content::-webkit-scrollbar { width: 6px; }
+            .main-content::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        }
+
+        /* --- ANIMATIONS --- */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .anim-element {
+            opacity: 0;
+            animation: fadeInUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+
+        /* --- HEADER --- */
+        header {
+            height: var(--header-height);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            flex-shrink: 0;
+            z-index: 50;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            background: rgba(0,0,0,0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .header-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            background: linear-gradient(to right, #fff, #a29bfe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 10px rgba(138, 43, 226, 0.3);
+        }
+
+        .icon-btn {
+            background: rgba(255,255,255,0.08);
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            border: none;
+            color: #eee;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+        .icon-btn:active { transform: scale(0.95); background: rgba(255,255,255,0.2); }
+
+        /* --- MAIN CONTENT --- */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 20px 20px 100px 20px; /* Padding bawah besar agar tidak tertutup navbar */
+            -webkit-overflow-scrolling: touch; /* Smooth scroll iOS */
+        }
+
+        /* --- INPUT CARD --- */
+        .glass-card {
+            background: rgba(30, 30, 45, 0.5);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.08);
+            margin-bottom: 20px;
+        }
+
+        .input-group { position: relative; margin-bottom: 15px; }
+
+        .input-box {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 14px 40px 14px 14px;
+            color: #fff;
+            font-size: 0.95rem;
+            transition: 0.3s;
+        }
+
+        .input-box:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.1);
+        }
+
+        .input-icon {
+            position: absolute; right: 15px; top: 50%;
+            transform: translateY(-50%); color: #888; pointer-events: none;
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary-purple), var(--secondary-purple));
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
+            display: flex; justify-content: center; align-items: center; gap: 8px;
+        }
+
+        .action-btn:active { transform: scale(0.98); }
+        .action-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+
+        /* --- PROGRESS BAR --- */
+        .progress-wrapper { margin-top: 15px; display: none; }
+        .progress-track {
+            width: 100%; height: 4px; background: rgba(255,255,255,0.1);
+            border-radius: 10px; overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%; width: 0%; background: var(--accent-cyan);
+            transition: width 0.3s ease;
+            box-shadow: 0 0 8px var(--accent-cyan);
+        }
+        .progress-text {
+            text-align: center; font-size: 0.7rem; color: #aaa;
+            margin-top: 6px; font-family: 'Courier Prime', monospace;
+        }
+
+        /* --- RESULT SECTION --- */
+        .result-section { display: none; }
+
+        .video-wrapper {
+            width: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #000;
+            margin-bottom: 15px;
+            border: 1px solid #333;
+            /* Responsive Aspect Ratio */
+            position: relative;
+            padding-top: 177%; /* 9:16 Aspect Ratio (TikTok Standard) */
+            max-height: 60vh; /* Agar tidak terlalu panjang */
+        }
+
+        .video-player {
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%;
+        }
+
+        .meta-info { text-align: center; margin-bottom: 15px; }
+        .meta-title { color: #fff; font-weight: 600; font-size: 0.95rem; margin-bottom: 2px; }
+        .meta-author { color: var(--accent-cyan); font-size: 0.85rem; font-family: 'Courier Prime', monospace; }
+
+        .stats-grid {
+            display: grid; grid-template-columns: 1fr 1fr 1fr;
+            background: rgba(0,0,0,0.2);
+            padding: 10px; border-radius: 10px; margin-bottom: 15px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .stat-item {
+            text-align: center; color: #ccc; font-size: 0.8rem;
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+        }
+        .stat-item i { color: var(--primary-purple); font-size: 1rem; }
+
+        .dl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        
+        .dl-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 12px; border-radius: 10px;
+            color: #fff; text-decoration: none;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: 0.2s;
+        }
+        .dl-btn:active { background: rgba(255,255,255,0.15); transform: scale(0.98); }
+        .dl-btn i { font-size: 1.1rem; margin-bottom: 4px; color: var(--accent-cyan); }
+        .dl-btn span { font-size: 0.85rem; font-weight: 600; }
+        .dl-btn small { font-size: 0.65rem; color: #888; }
+
+        /* --- TERMINAL LOG --- */
+        .terminal-log {
+            background: #080808; border: 1px solid #222;
+            border-radius: 10px; padding: 12px;
+            font-family: 'Courier Prime', monospace; font-size: 0.7rem;
+            height: 100px; overflow-y: auto; color: #00ff88;
+            margin-top: 20px;
+        }
+        .log-line { margin-bottom: 4px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        .log-error { color: #ff3355; }
+        .log-info { color: #777; }
+
+        /* --- NAVBAR --- */
+        .navbar {
+            position: absolute; /* Absolute relative to app-container */
+            bottom: 0; left: 0; width: 100%;
+            height: var(--nav-height);
+            background: rgba(10, 10, 12, 0.95);
+            display: flex; justify-content: space-around; align-items: center;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+        .nav-item {
+            font-size: 1.2rem; color: #555;
+            transition: 0.3s; position: relative;
+            width: 50px; height: 100%;
+            display: flex; justify-content: center; align-items: center;
+            text-decoration: none;
+        }
+        .nav-item.active { color: #fff; }
+        .nav-item.active::after {
+            content: ''; position: absolute; top: 0;
+            width: 30px; height: 3px; background: var(--primary-purple);
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 5px 15px var(--primary-purple);
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            position: absolute; top: 0; left: -100%;
+            width: var(--sidebar-width); height: 100%;
+            background: #0b0b0b; z-index: 999;
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-right: 1px solid #222;
+            display: flex; flex-direction: column;
+            box-shadow: 10px 0 50px rgba(0,0,0,0.5);
+        }
+        .sidebar.active { left: 0; }
+        
+        .sidebar-header {
+            height: 140px;
+            background-image: url('https://files.catbox.moe/o9hswi.jpg');
+            background-size: cover; background-position: center;
+            display: flex; flex-direction: column; justify-content: flex-end;
+            padding: 15px; position: relative;
+        }
+        .sidebar-header::after {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+        }
+        .sidebar-title, .sidebar-subtitle { position: relative; z-index: 2; color: white; }
+        .sidebar-title { font-family: 'Orbitron', sans-serif; font-size: 1.3rem; font-weight: 700; }
+        .sidebar-subtitle { font-size: 0.9rem; color: #aaa; }
+
+        .sidebar-menu { padding: 10px 0; }
+        .sidebar-item {
+            display: flex; align-items: center; padding: 12px 20px;
+            color: #ccc; font-family: 'Rajdhani', sans-serif; 
+            font-size: 1.1rem; text-decoration: none;
+            transition: 0.2s; border-left: 3px solid transparent;
+        }
+        .sidebar-item:hover { background: rgba(255,255,255,0.03); color: #fff; }
+        .sidebar-item i { width: 30px; color: var(--primary-purple); }
+
+        .overlay-backdrop {
+            position: absolute; inset: 0;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(2px);
+            z-index: 998; opacity: 0; visibility: hidden; transition: 0.3s;
+        }
+        .overlay-backdrop.active { opacity: 1; visibility: visible; }
+
+        /* --- TOAST --- */
+        .toast {
+            position: absolute; bottom: 90px; left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: rgba(20, 20, 25, 0.95);
+            border: 1px solid var(--accent-cyan);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+            padding: 10px 20px; border-radius: 50px;
+            display: flex; align-items: center; gap: 10px;
+            color: #fff; font-size: 0.9rem; font-weight: 600;
+            opacity: 0; visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1000; width: max-content; max-width: 90%;
+        }
+        .toast.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+        .toast i { color: var(--accent-cyan); }
+
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <div class="overlay-backdrop" onclick="toggleSidebar()"></div>
+
+        <div class="sidebar" id="mainSidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">Tokatsu</div>
+                <div class="sidebar-subtitle">Free Version 4.0</div>
+            </div>
+            <div class="sidebar-menu">
+                <a href="/myinfo" class="sidebar-item"><i class="fa-solid fa-circle-info"></i> My Info</a>
+                <a href="/dashboard" class="sidebar-item"><i class="fa-solid fa-house"></i> Dashboard</a>
+                <a href="/execution" class="sidebar-item"><i class="fa-solid fa-bug"></i> Attack Menu</a>
+            </div>
+        </div>
+
+        <header>
+            <a href="/dashboard" class="icon-btn"><i class="fa-solid fa-arrow-left"></i></a>
+            <div class="header-title">TikTok</div>
+            <button class="icon-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+        </header>
+
+        <div class="main-content">
+            
+            <div class="glass-card anim-element delay-1">
+                <div class="input-group">
+                    <input type="text" class="input-box" id="tiktok-url" placeholder="Paste TikTok Link...">
+                    <i class="fa-solid fa-link input-icon"></i>
+                </div>
+                
+                <button class="action-btn" onclick="downloadTikTok()" id="downloadBtn">
+                    <i class="fa-solid fa-bolt"></i> GET VIDEO
+                </button>
+
+                <div class="progress-wrapper" id="progress-container">
+                    <div class="progress-track">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                    <div class="progress-text" id="progress-text">Connecting...</div>
+                </div>
+            </div>
+
+            <div class="glass-card result-section" id="result-section">
+                <div class="meta-info">
+                    <div class="meta-title" id="video-title">Title Loading...</div>
+                    <div class="meta-author" id="video-author">@username</div>
+                </div>
+
+                <div class="video-wrapper">
+                    <video class="video-player" id="video-preview" controls loop playsinline></video>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-item"><i class="fa-solid fa-heart"></i> <span id="like-count">0</span></div>
+                    <div class="stat-item"><i class="fa-solid fa-comment"></i> <span id="comment-count">0</span></div>
+                    <div class="stat-item"><i class="fa-solid fa-share"></i> <span id="share-count">0</span></div>
+                </div>
+
+                <div class="dl-grid">
+                    <a href="#" class="dl-btn" id="dl-video">
+                        <i class="fa-solid fa-video"></i>
+                        <span>No Watermark</span>
+                        <small>MP4 HD</small>
+                    </a>
+                    <a href="#" class="dl-btn" id="dl-audio">
+                        <i class="fa-solid fa-music"></i>
+                        <span>Audio Only</span>
+                        <small>MP3 Format</small>
+                    </a>
+                </div>
+            </div>
+
+            <div class="terminal-log anim-element delay-3" id="log">
+                <div class="log-line">> System Initialized...</div>
+                <div class="log-line log-info">> Ready for input.</div>
+            </div>
+
+        </div>
+
+        <nav class="navbar">
+            <a href="/dashboard" class="nav-item">
+                <i class="fa-solid fa-house"></i>
+            </a>
+            <a href="#" class="nav-item active">
+                <i class="fa-brands fa-tiktok"></i>
+            </a>
+            <a href="/execution" class="nav-item">
+                <i class="fa-solid fa-bolt-lightning"></i>
+            </a>
+            <a href="/myinfo" class="nav-item">
+                <i class="fa-solid fa-circle-info"></i>
+            </a>
+        </nav>
+
+        <div class="toast" id="toast">
+            <i class="fa-solid fa-info-circle"></i>
+            <span id="toast-msg">Notification</span>
+        </div>
+
+    </div>
+
+    <script>
+        // Sidebar Toggle
+        function toggleSidebar() {
+            document.getElementById('mainSidebar').classList.toggle('active');
+            document.querySelector('.overlay-backdrop').classList.toggle('active');
+        }
+
+        // Utilities
+        const utils = {
+            log: (msg, type = '') => {
+                const log = document.getElementById('log');
+                const line = document.createElement('div');
+                line.className = `log-line ${type === 'error' ? 'log-error' : type === 'info' ? 'log-info' : ''}`;
+                line.innerText = `> ${msg}`;
+                log.appendChild(line);
+                log.scrollTop = log.scrollHeight;
+            },
+            toast: (msg) => {
+                const t = document.getElementById('toast');
+                document.getElementById('toast-msg').innerText = msg;
+                t.classList.add('show');
+                setTimeout(() => t.classList.remove('show'), 3000);
+            },
+            loading: (state) => {
+                const btn = document.getElementById('downloadBtn');
+                const prog = document.getElementById('progress-container');
+                if(state) {
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> PROCESSING...';
+                    prog.style.display = 'block';
+                } else {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa-solid fa-bolt"></i> GET VIDEO';
+                    prog.style.display = 'none';
+                }
+            },
+            progress: (pct, text) => {
+                document.getElementById('progress-fill').style.width = pct + '%';
+                document.getElementById('progress-text').innerText = text;
+            }
+        };
+
+        // API Logic
+        const API_ENDPOINTS = [
+            {
+                url: (url) => `https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`,
+                method: "GET",
+                parse: (data) => {
+                    if (data.data) {
+                        return {
+                            success: true,
+                            video: data.data.play || data.data.wmplay,
+                            music: data.data.music,
+                            title: data.data.title,
+                            author: data.data.author?.nickname || "User",
+                            stats: {
+                                like: data.data.digg_count || 0,
+                                comment: data.data.comment_count || 0,
+                                share: data.data.share_count || 0
+                            }
+                        };
+                    }
+                    throw new Error("Invalid response");
+                }
+            },
+            {
+                url: (url) => `https://www.tikdown.org/api/ajaxSearch?url=${encodeURIComponent(url)}&_=${Date.now()}`,
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8" },
+                parse: (data) => {
+                    if (data.data && data.links) {
+                        return {
+                            success: true,
+                            video: data.links[0]?.a || data.links[0]?.url,
+                            music: data.music,
+                            title: data.title,
+                            author: data.author,
+                            stats: {
+                                like: data.like_count || 0,
+                                comment: data.comment_count || 0,
+                                share: data.share_count || 0
+                            }
+                        };
+                    }
+                    throw new Error("Invalid response");
+                }
+            }
+        ];
+
+        async function fetchTikTokData(url) {
+            for (const endpoint of API_ENDPOINTS) {
+                try {
+                    utils.log(`Connecting to server...`, 'info');
+                    
+                    const options = { method: endpoint.method };
+                    if (endpoint.headers) options.headers = endpoint.headers;
+                    if (endpoint.method === "POST") options.body = new URLSearchParams({ url: url });
+
+                    const res = await fetch(endpoint.url(url), options);
+                    const data = await res.json();
+                    
+                    const result = endpoint.parse(data);
+                    if (result.success) return result;
+
+                } catch (e) {
+                    utils.log(`API Error: ${e.message}`, 'error');
+                }
+            }
+            throw new Error("All servers busy. Try again.");
+        }
+
+        async function downloadTikTok() {
+            const url = document.getElementById('tiktok-url').value.trim();
+            if (!url) return utils.toast("Please paste a link first!");
+
+            utils.loading(true);
+            document.getElementById('result-section').style.display = 'none';
+            utils.progress(10, "Initializing...");
+
+            try {
+                const data = await fetchTikTokData(url);
+                utils.progress(80, "Data retrieved...");
+
+                // Update UI
+                document.getElementById('video-title').innerText = data.title || "No Title";
+                document.getElementById('video-author').innerText = "@" + data.author;
+                document.getElementById('like-count').innerText = formatNumber(data.stats.like);
+                document.getElementById('comment-count').innerText = formatNumber(data.stats.comment);
+                document.getElementById('share-count').innerText = formatNumber(data.stats.share);
+
+                const vid = document.getElementById('video-preview');
+                vid.src = data.video;
+
+                // Setup Buttons
+                setupBtn('dl-video', data.video, `tiktok_${Date.now()}.mp4`);
+                setupBtn('dl-audio', data.music, `audio_${Date.now()}.mp3`);
+                
+                const audioBtn = document.getElementById('dl-audio');
+                if(!data.music) audioBtn.style.display = 'none';
+                else audioBtn.style.display = 'flex';
+
+                utils.progress(100, "Complete!");
+                
+                const resSec = document.getElementById('result-section');
+                resSec.style.display = 'block';
+                resSec.classList.add('anim-element');
+                
+                // Scroll to result on mobile
+                if(window.innerWidth < 768) {
+                    setTimeout(() => resSec.scrollIntoView({ behavior: 'smooth' }), 100);
+                }
+                
+                utils.log("Success!", "info");
+                utils.toast("Video found!");
+
+            } catch (e) {
+                utils.toast("Failed to download");
+                utils.log(e.message, 'error');
+            } finally {
+                utils.loading(false);
+            }
+        }
+
+        function setupBtn(id, url, name) {
+            const btn = document.getElementById(id);
+            btn.onclick = (e) => {
+                e.preventDefault();
+                utils.toast("Download started...");
+                const a = document.createElement('a');
+                a.href = url; a.download = name; a.target = '_blank';
+                document.body.appendChild(a); a.click(); document.body.removeChild(a);
+            }
+        }
+
+        function formatNumber(num) {
+            if(num >= 1000000) return (num/1000000).toFixed(1) + 'M';
+            if(num >= 1000) return (num/1000).toFixed(1) + 'K';
+            return num;
+        }
+    </script>
+</body>
+</html>

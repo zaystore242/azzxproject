@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>SHIZUKU - Login</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+
+  <style>
+    :root {
+      /* Palette Warna Baru */
+      --bg-deep: #05010a;
+      --bg-purple: #1a0b2e;
+      
+      --purple-deep: #4a0072;
+      --purple-neon: #9d00ff;
+      --purple-light: #a29bfe;
+      
+      --silver-dark: #717171;
+      --silver-light: #e0e0e0;
+      --silver-shine: #ffffff;
+
+      --glass-bg: rgba(20, 10, 35, 0.65);
+      --glass-border: rgba(255, 255, 255, 0.15);
+      --glass-shine: rgba(255, 255, 255, 0.05);
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    body {
+      font-family: 'Rajdhani', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: var(--bg-deep);
+      color: var(--silver-light);
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* --- Background Animations --- */
+    .aurora-bg {
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: 
+        radial-gradient(circle at 50% 50%, rgba(74, 0, 114, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 20% 80%, rgba(157, 0, 255, 0.1) 0%, transparent 40%);
+      z-index: -2;
+      animation: auroraSpin 20s linear infinite;
+    }
+
+    .cyber-grid {
+      position: absolute;
+      width: 200%;
+      height: 200%;
+      background-image: 
+        linear-gradient(rgba(157, 0, 255, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(157, 0, 255, 0.1) 1px, transparent 1px);
+      background-size: 50px 50px;
+      transform: perspective(500px) rotateX(60deg) translateY(-100px) translateZ(-200px);
+      animation: gridMove 10s linear infinite;
+      z-index: -1;
+      opacity: 0.3;
+      mask-image: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 100%);
+    }
+
+    @keyframes auroraSpin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes gridMove {
+      0% { transform: perspective(500px) rotateX(60deg) translateY(0) translateZ(-200px); }
+      100% { transform: perspective(500px) rotateX(60deg) translateY(50px) translateZ(-200px); }
+    }
+
+    /* --- Main Card --- */
+    .card {
+      position: relative;
+      width: 100%;
+      max-width: 380px;
+      padding: 40px 30px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-radius: 20px;
+      border: 1px solid var(--glass-border);
+      box-shadow: 
+        0 20px 50px rgba(0,0,0, 0.5),
+        0 0 30px rgba(157, 0, 255, 0.15),
+        inset 0 0 20px rgba(255, 255, 255, 0.02);
+      z-index: 10;
+      overflow: hidden;
+      animation: cardEntrance 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    /* Silver shine effect on top of card */
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--silver-shine), transparent);
+      opacity: 0.5;
+    }
+
+    @keyframes cardEntrance {
+      from { opacity: 0; transform: translateY(50px) scale(0.9); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* --- Logo Section --- */
+    .logo-wrapper {
+      position: relative;
+      width: 100px;
+      height: 100px;
+      margin: 0 auto 20px;
+      border-radius: 50%;
+      padding: 4px;
+      background: linear-gradient(135deg, var(--silver-dark), var(--purple-neon));
+      box-shadow: 0 0 20px rgba(157, 0, 255, 0.4);
+    }
+
+    .logo-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: #000;
+      overflow: hidden;
+      position: relative;
+      border: 2px solid var(--bg-deep);
+    }
+
+    .logo-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.9;
+    }
+
+    /* --- Typography --- */
+    .title-area {
+      text-align: center;
+      margin-bottom: 35px;
+    }
+
+    .main-title {
+      font-family: 'Syncopate', sans-serif;
+      font-weight: 700;
+      font-size: 24px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      background: linear-gradient(to bottom, var(--silver-shine), var(--silver-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    }
+
+    .rotating-text {
+      font-size: 14px;
+      color: var(--purple-light);
+      letter-spacing: 1px;
+      height: 20px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .rotator-track {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: rotateWords 9s infinite cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    }
+
+    .rotator-item {
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @keyframes rotateWords {
+      0%, 30% { transform: translateY(0); }
+      33%, 63% { transform: translateY(-20px); }
+      66%, 96% { transform: translateY(-40px); }
+      100% { transform: translateY(0); }
+    }
+
+    /* --- Form Elements --- */
+    .input-group {
+      position: relative;
+      margin-bottom: 25px;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 0;
+      top: 12px;
+      color: var(--silver-dark);
+      font-size: 18px;
+      transition: 0.3s;
+    }
+
+    .form-input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 10px 10px 10px 35px;
+      color: var(--silver-shine);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      outline: none;
+      transition: all 0.3s;
+    }
+
+    .form-input::placeholder {
+      color: rgba(255, 255, 255, 0.3);
+      font-weight: 500;
+    }
+
+    /* Animated Border Bottom */
+    .input-border {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--purple-neon), var(--silver-shine));
+      transition: width 0.4s ease;
+      box-shadow: 0 0 10px var(--purple-neon);
+    }
+
+    .form-input:focus ~ .input-border {
+      width: 100%;
+    }
+
+    .form-input:focus ~ .input-icon {
+      color: var(--purple-light);
+      text-shadow: 0 0 5px var(--purple-neon);
+    }
+
+    /* --- Buttons --- */
+    .btn-submit {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, var(--purple-deep), #2a0a45);
+      border: 1px solid rgba(157, 0, 255, 0.3);
+      color: var(--silver-shine);
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      cursor: pointer;
+      border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      margin-top: 10px;
+    }
+
+    .btn-submit:hover {
+      background: linear-gradient(135deg, var(--purple-neon), var(--purple-deep));
+      box-shadow: 0 0 25px rgba(157, 0, 255, 0.5);
+      border-color: var(--silver-light);
+      transform: translateY(-2px);
+    }
+
+    .btn-submit i {
+      margin-right: 10px;
+    }
+
+    /* --- Access Link --- */
+    .access-link {
+      display: block;
+      margin-top: 25px;
+      text-align: center;
+      text-decoration: none;
+      padding: 12px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      color: var(--silver-dark);
+      font-size: 14px;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+
+    .access-link:hover {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--silver-shine);
+      border-color: var(--silver-light);
+    }
+
+    .access-link i {
+      color: var(--purple-light);
+      margin-right: 5px;
+    }
+
+    /* --- Footer & Security --- */
+    .footer {
+      margin-top: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.3);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding-top: 15px;
+    }
+
+    .secure-badge {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .secure-badge i {
+      color: var(--purple-neon);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.5; }
+      50% { opacity: 1; text-shadow: 0 0 10px var(--purple-neon); }
+      100% { opacity: 0.5; }
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(50px);
+      background: rgba(0, 0, 0, 0.9);
+      border: 1px solid var(--purple-neon);
+      color: var(--silver-shine);
+      padding: 12px 24px;
+      border-radius: 50px;
+      font-size: 14px;
+      box-shadow: 0 0 20px rgba(157, 0, 255, 0.3);
+      opacity: 0;
+      transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* --- Decoration Particles --- */
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    
+    .particle {
+      position: absolute;
+      background: var(--silver-shine);
+      border-radius: 50%;
+      opacity: 0;
+      animation: floatUp 5s infinite;
+    }
+
+    @keyframes floatUp {
+      0% { transform: translateY(100vh) scale(0); opacity: 0; }
+      50% { opacity: 0.5; }
+      100% { transform: translateY(-10vh) scale(1); opacity: 0; }
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="aurora-bg"></div>
+  <div class="cyber-grid"></div>
+  <div class="particles" id="particles"></div>
+
+  <div class="card">
+    <div class="logo-wrapper">
+      <div class="logo-inner">
+        <img class="logo-img" src="https://files.catbox.moe/qnp558.jpg" alt="Logo">
+      </div>
+    </div>
+
+    <div class="title-area">
+      <h1 class="main-title">SHIZUKU CRASHER</h1>
+      <div class="rotating-text">
+        <div class="rotator-track">
+          <div class="rotator-item">SYSTEM ACCESS</div>
+          <div class="rotator-item">SHIZUKU CRASHER</div>
+          <div class="rotator-item">SECURE GATEWAY</div>
+        </div>
+      </div>
+    </div>
+
+    <form method="POST" action="/auth" id="loginForm">
+      <div class="input-group">
+        <i class="fas fa-user-astronaut input-icon"></i>
+        <input type="text" class="form-input" name="username" placeholder="Username" required autocomplete="off" />
+        <span class="input-border"></span>
+      </div>
+
+      <div class="input-group">
+        <i class="fas fa-fingerprint input-icon"></i>
+        <input type="password" class="form-input" name="key" placeholder="Password" required />
+        <span class="input-border"></span>
+      </div>
+
+      <button type="submit" class="btn-submit">
+        <i class="fa-solid fa-power-off"></i> Login
+      </button>
+    </form>
+
+    <a href="https://whatsapp.com/channel/0029VbD3Wxd8fewnbvPEq635" target="_blank" class="access-link">
+      <i class="fas fa-key"></i>Get Access
+    </a>
+
+    <div class="footer">
+      <span>© 2026 @azzxproject</span>
+      <div class="secure-badge">
+        <i class="fas fa-shield-halved"></i> Trenkripsi
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">
+    <i class="fas fa-info-circle" style="color: var(--purple-light)"></i>
+    <span id="toastMsg">Notification</span>
+  </div>
+
+  <script>
+    // Particle Generator
+    function createParticles() {
+      const container = document.getElementById('particles');
+      const particleCount = 20;
+
+      for (let i = 0; i < particleCount; i++) {
+        const p = document.createElement('div');
+        p.classList.add('particle');
+        
+        // Random properties
+        const size = Math.random() * 3 + 1;
+        const left = Math.random() * 100;
+        const duration = Math.random() * 5 + 5;
+        const delay = Math.random() * 5;
+
+        p.style.width = `${size}px`;
+        p.style.height = `${size}px`;
+        p.style.left = `${left}%`;
+        p.style.animationDuration = `${duration}s`;
+        p.style.animationDelay = `${delay}s`;
+        
+        // Randomly assign purple or silver color
+        if (Math.random() > 0.5) {
+          p.style.background = 'var(--purple-light)';
+          p.style.boxShadow = '0 0 5px var(--purple-neon)';
+        }
+
+        container.appendChild(p);
+      }
+    }
+
+    // Toast Logic
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      const msgSpan = document.getElementById('toastMsg');
+      
+      msgSpan.textContent = message;
+      toast.classList.add('show');
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      createParticles();
+
+      // Check URL parameters for messages
+      const params = new URLSearchParams(window.location.search);
+      const msg = params.get("msg");
+      if (msg) showToast(msg);
+
+      // Form Animation
+      const inputs = document.querySelectorAll('.form-input');
+      inputs.forEach(input => {
+        input.addEventListener('focus', () => {
+          input.parentElement.querySelector('.input-icon').style.transform = 'scale(1.2)';
+        });
+        input.addEventListener('blur', () => {
+          input.parentElement.querySelector('.input-icon').style.transform = 'scale(1)';
+        });
+      });
+
+      // Submit Button Animation
+      document.getElementById('loginForm').addEventListener('submit', function(e) {
+        const btn = this.querySelecto0r('button');
+        const icon = btn.querySelector('i');
+        
+        btn.style.opacity = '0.8';
+        btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> AUTHENTICATING...';
+        
+        // Just for visual feedback demo, form will submit normally
+      });
+    });
+  </script>
+</body>
+</html>

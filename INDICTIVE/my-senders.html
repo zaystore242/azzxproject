@@ -1,0 +1,1078 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>My Senders - Tokatsu</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-purple: #8A2BE2;
+            --secondary-purple: #4c1d95;
+            --accent-cyan: #00f3ff;
+            --glass-bg: rgba(20, 20, 30, 0.7);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --sidebar-width: 280px;
+            --header-height: 70px;
+            --nav-height: 70px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Rajdhani', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+            outline: none;
+        }
+
+        body {
+            background-color: #050505;
+            min-height: 100vh;
+            background: radial-gradient(circle at 50% 20%, #1a0b2e 0%, #000 60%);
+            background-size: 200% 200%;
+            animation: bgPulse 10s ease infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        @keyframes bgPulse {
+            0% { background-position: 50% 0%; }
+            50% { background-position: 50% 20%; }
+            100% { background-position: 50% 0%; }
+        }
+
+        /* --- CONTAINER RESPONSIVE --- */
+        .app-container {
+            width: 100%;
+            height: 100dvh;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            color: white;
+            background: rgba(10, 10, 15, 0.95);
+            overflow: hidden;
+        }
+
+        /* Desktop Mode (> 768px) */
+        @media (min-width: 768px) {
+            .app-container {
+                width: 400px;
+                height: 85vh;
+                max-height: 900px;
+                border-radius: 30px;
+                border: 1px solid rgba(255, 255, 255, 0.15);
+                box-shadow: 0 0 50px rgba(138, 43, 226, 0.3);
+            }
+            
+            .main-content::-webkit-scrollbar { width: 5px; }
+            .main-content::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        }
+
+        /* --- ANIMATIONS --- */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .anim-element {
+            opacity: 0;
+            animation: fadeInUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+
+        /* --- HEADER --- */
+        header {
+            height: var(--header-height);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            flex-shrink: 0;
+            z-index: 50;
+            background: rgba(0,0,0,0.2);
+            backdrop-filter: blur(5px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .header-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            background: linear-gradient(to right, #fff, #a29bfe);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 10px rgba(138, 43, 226, 0.3);
+        }
+
+        .icon-btn {
+            background: rgba(255,255,255,0.08);
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            border: none;
+            color: #eee;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+        .icon-btn:active { transform: scale(0.95); background: rgba(255,255,255,0.2); }
+
+        /* --- MAIN CONTENT --- */
+        .main-content {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 20px 20px 100px 20px;
+        }
+
+        /* --- CARDS & INPUTS --- */
+        .glass-card {
+            background: rgba(30, 30, 45, 0.5);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid rgba(255,255,255,0.08);
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .input-box {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 14px 40px 14px 14px;
+            color: #fff;
+            font-size: 0.95rem;
+            transition: 0.3s;
+        }
+
+        .input-box:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.15);
+        }
+
+        .input-icon {
+            position: absolute; right: 15px; top: 50%;
+            transform: translateY(-50%); color: #888;
+        }
+
+        .action-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary-purple), var(--secondary-purple));
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3);
+            display: flex; justify-content: center; align-items: center; gap: 8px;
+        }
+
+        .action-btn:active { transform: scale(0.98); }
+        .action-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+
+        /* --- SENDER LIST --- */
+        .sender-list { margin-top: 15px; }
+
+        .sender-item {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            margin: 8px 0;
+            padding: 12px;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: 0.3s;
+        }
+
+        .sender-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: var(--accent-cyan);
+        }
+
+        .sender-status {
+            width: 10px; height: 10px; border-radius: 50%;
+            margin-right: 12px; flex-shrink: 0;
+        }
+
+        .sender-status.connected { background: #00ff88; box-shadow: 0 0 8px #00ff88; }
+        .sender-status.connecting { background: #ffaa00; animation: pulse 1.5s infinite; }
+        .sender-status.waiting_qr { background: #ffaa00; animation: pulse 1.5s infinite; }
+        .sender-status.waiting_pairing { background: #00d9ff; animation: pulse 1s infinite; }
+        .sender-status.requesting_code { background: #00d9ff; animation: pulse 1s infinite; }
+        .sender-status.reconnecting { background: #ffaa00; animation: pulse 1.5s infinite; }
+        .sender-status.disconnected { background: #ff3366; }
+        .sender-status.error { background: #ff3366; }
+        .sender-status.timeout { background: #ff3366; }
+        .sender-status.logged_out { background: #ff3366; }
+
+        @keyframes pulse {
+            0% { opacity: 0.5; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+            100% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        .sender-info { flex: 1; overflow: hidden; }
+        .sender-info h5 { color: #fff; font-size: 0.95rem; font-weight: 600; margin-bottom: 2px; }
+        .sender-info p { color: #aaa; font-size: 0.75rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .delete-btn {
+            background: rgba(255, 51, 102, 0.1);
+            border: 1px solid rgba(255, 51, 102, 0.3);
+            border-radius: 8px;
+            color: #ff3366;
+            width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: 0.2s;
+        }
+        .delete-btn:hover { background: rgba(255, 51, 102, 0.3); }
+
+        /* --- TERMINAL LOG --- */
+        .terminal-log {
+            background: #080808; border: 1px solid #222;
+            border-radius: 12px; padding: 12px;
+            font-family: 'Courier Prime', monospace; font-size: 0.7rem;
+            height: 100px; overflow-y: auto; color: #00ff88;
+            margin-top: 15px; margin-bottom: 15px;
+        }
+        .log-line { margin-bottom: 4px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        .log-error { color: #ff3355; }
+        .log-success { color: #00ff88; }
+        .log-info { color: #888; }
+
+        /* --- NAVBAR (CONTAINED) --- */
+        .navbar {
+            position: absolute;
+            bottom: 0; left: 0; width: 100%;
+            height: var(--nav-height);
+            background: rgba(8, 8, 10, 0.98);
+            display: flex; justify-content: space-around; align-items: center;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            z-index: 100;
+        }
+        .nav-item {
+            font-size: 1.2rem; color: #555;
+            transition: 0.3s; position: relative;
+            width: 50px; height: 100%;
+            display: flex; justify-content: center; align-items: center;
+            text-decoration: none;
+        }
+        .nav-item.active { color: #fff; }
+        .nav-item.active::after {
+            content: ''; position: absolute; top: 0;
+            width: 30px; height: 3px; background: var(--primary-purple);
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 5px 15px var(--primary-purple);
+        }
+
+        /* --- SIDEBAR (CONTAINED) --- */
+        .sidebar {
+            position: absolute;
+            top: 0; left: -100%; width: var(--sidebar-width); height: 100%;
+            background: #0b0b0b; z-index: 999;
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-right: 1px solid #222;
+            display: flex; flex-direction: column;
+            box-shadow: 10px 0 50px rgba(0,0,0,0.5);
+        }
+        .sidebar.active { left: 0; }
+        
+        .sidebar-header {
+            height: 150px; background-image: url('https://files.catbox.moe/o9hswi.jpg');
+            background-size: cover; display: flex; flex-direction: column; justify-content: flex-end;
+            padding: 15px; position: relative;
+        }
+        .sidebar-header::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); z-index: 0; }
+        .sidebar-title, .sidebar-subtitle { position: relative; z-index: 1; color: white; }
+        .sidebar-title { font-family: 'Orbitron', sans-serif; font-size: 1.3rem; font-weight: 700; }
+        .sidebar-subtitle { font-family: 'Rajdhani'; font-size: 1rem; color: #ccc; }
+
+        .sidebar-menu { padding: 10px 0; }
+        .sidebar-item {
+            display: flex; align-items: center; padding: 12px 20px;
+            color: #ccc; font-family: 'Rajdhani', sans-serif; font-size: 1.1rem;
+            text-decoration: none; transition: 0.2s; border-left: 3px solid transparent;
+        }
+        .sidebar-item:hover { background: rgba(255,255,255,0.03); color: #fff; padding-left: 25px; }
+        .sidebar-item i { width: 30px; margin-right: 5px; text-align: center; color: var(--primary-purple); }
+
+        .overlay-backdrop {
+            position: absolute; inset: 0;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(2px);
+            z-index: 998; opacity: 0; visibility: hidden; transition: 0.3s;
+        }
+        .overlay-backdrop.active { opacity: 1; visibility: visible; }
+
+        /* --- TOAST --- */
+        .toast {
+            position: absolute; bottom: 90px; left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: rgba(20, 20, 25, 0.95); border: 1px solid var(--accent-cyan);
+            padding: 10px 20px; border-radius: 50px;
+            display: flex; align-items: center; gap: 10px;
+            color: #fff; font-size: 0.9rem; font-weight: 600;
+            opacity: 0; visibility: hidden; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 2000; width: max-content; max-width: 90%;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+        .toast.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+        .toast i { color: var(--accent-cyan); }
+
+        /* --- MODAL STYLES (FIXED) --- */
+        .modal {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            background: rgba(0,0,0,0.95) !important;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+            z-index: 10000 !important;
+            backdrop-filter: blur(5px) !important;
+        }
+        
+        .modal-content {
+            background: rgba(25, 25, 35, 0.98) !important;
+            border: 2px solid var(--primary-purple) !important;
+            border-radius: 20px !important;
+            padding: 25px !important;
+            width: 90% !important;
+            max-width: 350px !important;
+            color: white !important;
+            text-align: center !important;
+            box-shadow: 0 20px 60px rgba(138, 43, 226, 0.3) !important;
+            position: relative !important;
+            animation: fadeIn 0.3s ease !important;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .modal-content h3 { 
+            color: var(--accent-cyan); 
+            margin-bottom: 15px; 
+            font-family: 'Orbitron'; 
+            font-size: 1.1rem; 
+        }
+        
+        .code-display {
+            background: rgba(0, 0, 0, 0.4); 
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px; 
+            padding: 15px; 
+            margin: 15px 0;
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px;
+        }
+
+        .code-text {
+            font-size: 1.5rem; 
+            font-weight: 900; 
+            letter-spacing: 2px;
+            color: white; 
+            font-family: 'Courier Prime', monospace;
+            word-break: break-all;
+        }
+        
+        .copy-btn {
+            background: rgba(255,255,255,0.05); 
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px; 
+            color: white; 
+            padding: 8px;
+            cursor: pointer; 
+            transition: 0.3s; 
+            font-size: 0.8rem;
+        }
+        .copy-btn:hover { background: rgba(255,255,255,0.15); }
+        .copy-btn.copied { 
+            background: rgba(0, 255, 136, 0.1); 
+            color: #00ff88; 
+            border-color: #00ff88; 
+        }
+        
+        .modal-instructions {
+            text-align: left; 
+            background: rgba(255,255,255,0.03);
+            padding: 12px; 
+            border-radius: 10px; 
+            margin: 15px 0;
+            border-left: 3px solid var(--accent-cyan);
+        }
+
+        .modal-instructions h4 { 
+            color: var(--accent-cyan); 
+            margin-bottom: 5px; 
+            font-size: 0.8rem; 
+        }
+        .modal-instructions ol { 
+            color: #aaa; 
+            padding-left: 20px; 
+            font-size: 0.75rem; 
+            margin: 0;
+        }
+        .modal-instructions li { margin-bottom: 5px; }
+
+        .modal-warning { 
+            color: #ffaa00; 
+            font-size: 0.75rem; 
+            margin: 15px 0; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 6px; 
+        }
+        
+        .close-btn {
+            background: linear-gradient(135deg, var(--primary-purple), var(--secondary-purple));
+            color: white; 
+            border: none; 
+            padding: 12px;
+            border-radius: 10px; 
+            cursor: pointer; 
+            font-weight: bold;
+            font-family: 'Orbitron', sans-serif; 
+            width: 100%;
+        }
+        .close-btn:active { transform: scale(0.98); }
+
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <div class="overlay-backdrop" onclick="toggleSidebar()"></div>
+
+        <div class="sidebar" id="mainSidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">Tokatsu</div>
+                <div class="sidebar-subtitle">Free Version</div>
+            </div>
+            <div class="sidebar-menu">
+                <a href="/myinfo" class="sidebar-item"><i class="fa-solid fa-circle-info"></i> My Info</a>
+                <a href="/dashboard" class="sidebar-item"><i class="fa-solid fa-house"></i> Dashboard</a>
+                <a href="/execution" class="sidebar-item"><i class="fa-solid fa-bug"></i> Attack Menu</a>
+            </div>
+        </div>
+
+        <header>
+            <a href="/dashboard" class="icon-btn"><i class="fa-solid fa-arrow-left"></i></a>
+            <div class="header-title">MY SENDERS</div>
+            <button class="icon-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+        </header>
+
+        <div class="main-content">
+            
+            <div class="glass-card anim-element delay-1">
+                <div class="input-group">
+                    <input type="tel" class="input-box" id="senderNumber" placeholder="Ex: 6281234567890">
+                    <i class="fa-solid fa-phone input-icon"></i>
+                </div>
+                
+                <button class="action-btn" onclick="addSender()" id="addSenderBtn">
+                    <i class="fa-solid fa-plus"></i> ADD SENDER
+                </button>
+            </div>
+
+            <div class="glass-card anim-element delay-2">
+                <h3 style="color: var(--accent-cyan); margin-bottom: 15px; font-family: 'Orbitron', sans-serif; font-size: 0.9rem;">
+                    <i class="fa-solid fa-list"></i> ACTIVE SENDERS
+                </h3>
+                
+                <div class="sender-list" id="senderList">
+                    <div id="noSendersMessage" style="text-align: center; color: #555; padding: 20px;">
+                        <i class="fa-solid fa-inbox" style="font-size: 1.5rem; margin-bottom: 8px;"></i>
+                        <p style="font-size: 0.8rem;">No senders added yet</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="terminal-log anim-element delay-3" id="log">
+                <div class="log-line">> System Initialized...</div>
+                <div class="log-line log-info">> Ready to manage WhatsApp senders.</div>
+            </div>
+
+        </div>
+
+        <nav class="navbar">
+            <a href="/dashboard" class="nav-item">
+                <i class="fa-solid fa-house"></i>
+            </a>
+            <a href="#" class="nav-item active">
+                <i class="fa-solid fa-satellite-dish"></i>
+            </a>
+            <a href="/execution" class="nav-item">
+                <i class="fa-solid fa-bolt-lightning"></i>
+            </a>
+            <a href="/myinfo" class="nav-item">
+                <i class="fa-solid fa-circle-info"></i>
+            </a>
+        </nav>
+
+        <div class="toast" id="toast">
+            <i class="fa-solid fa-info-circle"></i>
+            <span id="toast-msg">Notification</span>
+        </div>
+
+    </div>
+
+    <script>
+        // Global variables
+        let eventSource = null;
+        const activeSenders = new Map();
+
+        // Sidebar Toggle
+        function toggleSidebar() {
+            document.getElementById('mainSidebar').classList.toggle('active');
+            document.querySelector('.overlay-backdrop').classList.toggle('active');
+        }
+
+        // Utils
+        const utils = {
+            log: (msg, type = '') => {
+                const log = document.getElementById('log');
+                const line = document.createElement('div');
+                line.className = `log-line ${type === 'error' ? 'log-error' : type === 'info' ? 'log-info' : type === 'success' ? 'log-success' : ''}`;
+                line.innerText = `> ${msg}`;
+                log.appendChild(line);
+                log.scrollTop = log.scrollHeight;
+                
+                // Juga log ke console untuk debugging
+                console.log(`[LOG] ${type.toUpperCase()}: ${msg}`);
+            },
+            toast: (msg) => {
+                const t = document.getElementById('toast');
+                document.getElementById('toast-msg').innerText = msg;
+                t.classList.add('show');
+                setTimeout(() => t.classList.remove('show'), 3000);
+                console.log(`[TOAST] ${msg}`);
+            },
+            showModal: (html) => {
+                console.log('📦 Appending modal to DOM');
+                
+                // Remove existing modal
+                const existingModal = document.querySelector('.modal');
+                if (existingModal) {
+                    console.log('🗑️ Removing existing modal');
+                    existingModal.remove();
+                }
+                
+                // Append to body for better z-index handling
+                document.body.insertAdjacentHTML('beforeend', html);
+                console.log('✅ Modal appended to body');
+            },
+            closeModal: () => {
+                const modal = document.querySelector('.modal');
+                if (modal) {
+                    console.log('🗑️ Closing modal');
+                    modal.remove();
+                }
+            }
+        };
+
+        // Sender Management Functions
+        async function addSender() {
+            const numberInput = document.getElementById('senderNumber');
+            let number = numberInput.value.replace(/\D/g, '');
+            
+            if (!number) return utils.toast("Please enter a WhatsApp number!");
+            if (number.length < 8) return utils.toast("Number is too short!");
+            if (!number.startsWith('62')) return utils.toast("Number must start with 62!");
+            
+            const addBtn = document.getElementById('addSenderBtn');
+            const originalText = addBtn.innerHTML;
+            
+            addBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ADDING...';
+            addBtn.disabled = true;
+
+            try {
+                const response = await fetch('/api/add-sender', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ number: number })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    utils.log(`Sender ${number} added - waiting for connection`, 'info');
+                    utils.toast(data.message || `Sender ${number} added successfully!`);
+                    
+                    // Add sender to UI
+                    addSenderToUI(number, 'connecting', 'Connecting to WhatsApp...');
+                    numberInput.value = '';
+                } else {
+                    utils.log(`Failed to add sender ${number}: ${data.error}`, 'error');
+                    utils.toast(data.error || "Failed to add sender!");
+                }
+            } catch (error) {
+                console.error('Error adding sender:', error);
+                utils.log(`Error adding sender ${number}: ${error.message}`, 'error');
+                utils.toast("Network error - please try again!");
+            } finally {
+                addBtn.innerHTML = originalText;
+                addBtn.disabled = false;
+            }
+        }
+
+        async function deleteSender(number) {
+            if (!confirm(`Are you sure you want to delete sender ${number}?`)) return;
+            
+            try {
+                const response = await fetch('/api/delete-sender', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ number: number })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Remove from UI
+                    removeSenderFromUI(number);
+                    utils.log(`Sender ${number} deleted`, 'info');
+                    utils.toast(data.message || `Sender ${number} deleted successfully!`);
+                } else {
+                    utils.log(`Failed to delete sender ${number}: ${data.error}`, 'error');
+                    utils.toast(data.error || "Failed to delete sender!");
+                }
+            } catch (error) {
+                console.error('Error deleting sender:', error);
+                utils.log(`Error deleting sender ${number}: ${error.message}`, 'error');
+                utils.toast("Network error - please try again!");
+            }
+        }
+
+        function addSenderToUI(number, status, message) {
+            // Hide no senders message if it exists
+            const noMsg = document.getElementById('noSendersMessage');
+            if (noMsg) noMsg.style.display = 'none';
+            
+            // Check if sender already exists in UI
+            const existingSender = document.querySelector(`[data-number="${number}"]`);
+            if (existingSender) {
+                updateSenderStatus(number, status, message);
+                return;
+            }
+            
+            // Create new sender element
+            const senderList = document.getElementById('senderList');
+            const newSender = document.createElement('div');
+            newSender.className = 'sender-item';
+            newSender.setAttribute('data-number', number);
+            newSender.innerHTML = `
+                <div class="sender-status ${status}"></div>
+                <div class="sender-info">
+                    <h5>${number}</h5>
+                    <p class="status-message">${message}</p>
+                </div>
+                <button class="delete-btn" onclick="deleteSender('${number}')">
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            `;
+            senderList.appendChild(newSender);
+            
+            // Store in active senders map
+            activeSenders.set(number, { status, message });
+            
+            console.log(`✅ Added sender to UI: ${number} with status: ${status}`);
+        }
+
+        function updateSenderStatus(number, status, message) {
+            const senderElement = document.querySelector(`[data-number="${number}"]`);
+            if (!senderElement) {
+                console.log(`❌ Sender element not found for: ${number}`);
+                return;
+            }
+            
+            // Update status indicator
+            const statusIndicator = senderElement.querySelector('.sender-status');
+            statusIndicator.className = `sender-status ${status}`;
+            
+            // Update status message
+            const statusMessage = senderElement.querySelector('.status-message');
+            statusMessage.textContent = message;
+            
+            // Update in active senders map
+            activeSenders.set(number, { status, message });
+            
+            console.log(`🔄 Updated sender ${number} status: ${status} - ${message}`);
+        }
+
+        function removeSenderFromUI(number) {
+            const senderElement = document.querySelector(`[data-number="${number}"]`);
+            if (senderElement) {
+                senderElement.remove();
+                console.log(`🗑️ Removed sender from UI: ${number}`);
+            }
+            
+            // Remove from active senders map
+            activeSenders.delete(number);
+            
+            // Show no senders message if no senders left
+            const senderList = document.getElementById('senderList');
+            if (senderList.children.length === 0 || 
+                (senderList.children.length === 1 && senderList.children[0].id === 'noSendersMessage')) {
+                const noSendersMessage = document.getElementById('noSendersMessage');
+                if (noSendersMessage) {
+                    noSendersMessage.style.display = 'block';
+                }
+            }
+        }
+
+        function showPairingCodeModal(number, code, instructions = []) {
+            console.log('🔧 Building pairing code modal for:', number, 'Code:', code);
+            
+            const cleanCode = code.replace(/-/g, '');
+            const formattedCode = cleanCode.length === 8 ? 
+                `${cleanCode.substring(0, 4)}-${cleanCode.substring(4)}` : 
+                cleanCode;
+            
+            // Pastikan instructions ada dan berupa array
+            const instructionList = instructions && instructions.length > 0 ? instructions : [
+                '1. Buka WhatsApp di HP Anda',
+                '2. Tap ⋮ (titik tiga) > Linked Devices > Link a Device', 
+                '3. Masukkan kode pairing berikut:',
+                `KODE: ${formattedCode}`,
+                '4. Kode berlaku 30 detik!'
+            ];
+            
+            console.log('📝 Instructions:', instructionList);
+            
+            const modalHtml = `
+                <div class="modal">
+                    <div class="modal-content">
+                        <h3><i class="fa-solid fa-qrcode"></i> PAIRING CODE</h3>
+                        
+                        <div class="code-display">
+                            <div class="code-text" id="pairingCodeValue">${formattedCode}</div>
+                            <button class="copy-btn" id="copyCodeBtn">
+                                <i class="fa-solid fa-copy"></i> COPY CODE
+                            </button>
+                        </div>
+                        
+                        <div class="modal-instructions">
+                            <h4>INSTRUCTIONS:</h4>
+                            <ol>
+                                ${instructionList.map(instruction => `<li>${instruction}</li>`).join('')}
+                            </ol>
+                        </div>
+                        
+                        <div class="modal-warning">
+                            <i class="fa-solid fa-shield-alt"></i>
+                            DO NOT share this code with anyone!
+                        </div>
+                        
+                        <button class="close-btn" id="closeModalBtn">
+                            <i class="fa-solid fa-check-circle"></i> I UNDERSTAND
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            console.log('🔄 Adding modal to DOM...');
+            utils.showModal(modalHtml);
+            console.log('✅ Modal added to DOM');
+            
+            // Setup copy functionality
+            const copyBtn = document.getElementById('copyCodeBtn');
+            if (copyBtn) {
+                copyBtn.addEventListener('click', function() {
+                    const codeToCopy = cleanCode;
+                    
+                    if (navigator.clipboard && window.isSecureContext) {
+                        navigator.clipboard.writeText(codeToCopy).then(() => {
+                            showCopySuccess(this);
+                        }).catch(err => {
+                            console.error('Clipboard API error:', err);
+                            fallbackCopyTextToClipboard(codeToCopy, this);
+                        });
+                    } else {
+                        fallbackCopyTextToClipboard(codeToCopy, this);
+                    }
+                });
+            } else {
+                console.error('❌ Copy button not found!');
+            }
+            
+            // Setup close functionality
+            const closeBtn = document.getElementById('closeModalBtn');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', function() {
+                    console.log('🗑️ Closing modal');
+                    utils.closeModal();
+                });
+            }
+            
+            // Auto close after 30 seconds
+            setTimeout(() => {
+                console.log('⏰ Auto-closing modal (30s timeout)');
+                if (document.querySelector('.modal')) {
+                    utils.closeModal();
+                    utils.log(`Pairing code for ${number} expired`, 'info');
+                }
+            }, 30000);
+            
+            function fallbackCopyTextToClipboard(text, buttonElement) {
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                textArea.style.position = "fixed";
+                textArea.style.left = "-999999px";
+                textArea.style.top = "-999999px";
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                
+                try {
+                    const successful = document.execCommand('copy');
+                    if (successful) {
+                        showCopySuccess(buttonElement);
+                    } else {
+                        utils.toast("Failed to copy code automatically");
+                        // Fallback: show code in alert
+                        alert(`Please manually copy this code: ${text}`);
+                    }
+                } catch (err) {
+                    utils.toast("Copy failed: " + err);
+                    alert(`Please manually copy this code: ${text}`);
+                }
+                
+                document.body.removeChild(textArea);
+            }
+            
+            function showCopySuccess(buttonElement) {
+                const originalHTML = buttonElement.innerHTML;
+                buttonElement.innerHTML = '<i class="fa-solid fa-check"></i> COPIED!';
+                buttonElement.classList.add('copied');
+                utils.toast('Pairing code copied to clipboard!');
+                
+                setTimeout(() => {
+                    buttonElement.innerHTML = originalHTML;
+                    buttonElement.classList.remove('copied');
+                }, 2000);
+            }
+        }
+
+        // Event Source for real-time updates
+        function connectEventSource() {
+            if (eventSource) {
+                eventSource.close();
+            }
+            
+            // Dapatkan username dari cookie
+            function getCurrentUsername() {
+                const match = document.cookie.match(/sessionUser=([^;]+)/);
+                return match ? match[1] : 'unknown';
+            }
+            
+            const username = getCurrentUsername();
+            console.log('🔄 Connecting to EventSource for user:', username);
+            
+            eventSource = new EventSource('/api/events');
+            
+            eventSource.onopen = function() {
+                console.log('✅ EventSource connected successfully');
+                utils.log('Connected to real-time events', 'success');
+            };
+            
+            eventSource.onmessage = function(event) {
+                console.log('📨 Raw event received:', event.data);
+                try {
+                    const data = JSON.parse(event.data);
+                    handleEventData(data);
+                } catch (error) {
+                    console.error('❌ Error parsing event data:', error);
+                }
+            };
+            
+            eventSource.onerror = function(error) {
+                console.error('❌ EventSource error:', error);
+                utils.log('Event connection lost, reconnecting...', 'error');
+                setTimeout(connectEventSource, 5000);
+            };
+        }
+        
+        function handleEventData(data) {
+            console.log('📨 Event received:', data);
+            
+            const { type, number, status, message, code, instructions, formattedCode } = data;
+            
+            switch(type) {
+                case 'status':
+                    if (number && status) {
+                        updateSenderStatus(number, status, message || 'Processing...');
+                        utils.log(`Sender ${number}: ${status} - ${message}`, 'info');
+                    }
+                    break;
+                    
+                case 'pairing_code':
+                    console.log('🎯 PAIRING CODE EVENT:', { number, code, formattedCode });
+                    if (number && code) {
+                        updateSenderStatus(number, 'waiting_pairing', 'Waiting for pairing...');
+                        utils.log(`Pairing code received for ${number}: ${code}`, 'info');
+                        
+                        // Panggil fungsi untuk menampilkan modal
+                        showPairingCodeModal(number, code, instructions);
+                    } else {
+                        console.error('❌ Missing number or code in pairing_code event:', data);
+                    }
+                    break;
+                    
+                case 'qr':
+                    if (number) {
+                        updateSenderStatus(number, 'waiting_qr', 'Waiting for QR scan...');
+                        utils.log(`QR code generated for ${number}`, 'info');
+                    }
+                    break;
+                    
+                case 'success':
+                    if (number && status === 'connected') {
+                        updateSenderStatus(number, 'connected', 'Connected successfully');
+                        utils.log(`Sender ${number} connected successfully`, 'success');
+                        utils.toast(`Sender ${number} connected successfully!`);
+                    }
+                    break;
+                    
+                case 'error':
+                    if (number) {
+                        updateSenderStatus(number, 'error', message || 'Connection failed');
+                        utils.log(`Sender ${number} error: ${message}`, 'error');
+                        utils.toast(`Error with sender ${number}: ${message}`);
+                    }
+                    break;
+                    
+                case 'connected':
+                    if (number) {
+                        updateSenderStatus(number, 'connected', 'Connected');
+                        utils.log(`Sender ${number} connected`, 'success');
+                    }
+                    break;
+                    
+                case 'connecting':
+                    if (number) {
+                        updateSenderStatus(number, 'connecting', 'Connecting...');
+                        utils.log(`Sender ${number} connecting`, 'info');
+                    }
+                    break;
+                    
+                case 'requesting_code':
+                    if (number) {
+                        updateSenderStatus(number, 'requesting_code', 'Requesting pairing code...');
+                        utils.log(`Requesting pairing code for ${number}`, 'info');
+                    }
+                    break;
+                    
+                case 'reconnecting':
+                    if (number) {
+                        updateSenderStatus(number, 'reconnecting', 'Reconnecting...');
+                        utils.log(`Sender ${number} reconnecting`, 'info');
+                    }
+                    break;
+                    
+                default:
+                    console.log('📨 Unknown event type:', type, data);
+            }
+        }
+
+        // Load existing senders on page load
+        async function loadSenders() {
+            try {
+                const response = await fetch('/api/mysenders');
+                const data = await response.json();
+                
+                if (data.success) {
+                    const senders = data.senders || [];
+                    
+                    if (senders.length === 0) {
+                        // Show no senders message
+                        document.getElementById('noSendersMessage').style.display = 'block';
+                    } else {
+                        // Hide no senders message
+                        document.getElementById('noSendersMessage').style.display = 'none';
+                        
+                        // Add each sender to UI
+                        senders.forEach(number => {
+                            // Check if sender is active in sessions
+                            addSenderToUI(
+                                number, 
+                                'disconnected', 
+                                'Disconnected'
+                            );
+                        });
+                        
+                        utils.log(`Loaded ${senders.length} sender(s)`, 'success');
+                    }
+                } else {
+                    utils.log('Failed to load senders', 'error');
+                }
+            } catch (error) {
+                console.error('Error loading senders:', error);
+                utils.log('Error loading senders: ' + error.message, 'error');
+            }
+        }
+
+        // Test function untuk manual testing modal
+        function testModalManually() {
+            console.log('🧪 Testing modal manually');
+            const testHtml = `
+                <div class="modal">
+                    <div class="modal-content">
+                        <h3><i class="fa-solid fa-qrcode"></i> TEST MODAL</h3>
+                        <div class="code-display">
+                            <div class="code-text">1234-5678</div>
+                            <button class="copy-btn" onclick="alert('Copied!')">
+                                <i class="fa-solid fa-copy"></i> COPY CODE
+                            </button>
+                        </div>
+                        <button class="close-btn" onclick="document.querySelector('.modal').remove()">
+                            <i class="fa-solid fa-times"></i> CLOSE
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', testHtml);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 My Senders system initialized');
+            utils.log('My Senders system initialized', 'success');
+            loadSenders();
+            connectEventSource();
+            
+            // Untuk testing: buka console dan jalankan testModalManually()
+            window.testModalManually = testModalManually;
+        });
+    </script>
+</body>
+</html>

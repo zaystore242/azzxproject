@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NSFW Generator - Tokatsu</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-purple: #8A2BE2;
+            --accent-pink: #a29bfe;
+            --accent-cyan: #00f3ff;
+            --glass-bg: rgba(20, 20, 30, 0.85);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --sidebar-width: 300px;
+        }
+
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'Rajdhani', sans-serif; 
+            -webkit-tap-highlight-color: transparent; 
+            outline: none; 
+        }
+        
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+            -webkit-text-size-adjust: 100%;
+            text-size-adjust: 100%;
+            touch-action: manipulation;
+        }
+        
+        body { 
+            background-color: #050505; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            background: radial-gradient(circle at 50% 20%, #1a0b2e 0%, #000 60%); 
+            background-size: 200% 200%; 
+            animation: bgPulse 10s ease infinite; 
+            overflow: hidden; 
+            padding: 0;
+            margin: 0;
+            width: 100%;
+        }
+        
+        @keyframes bgPulse { 
+            0% { background-position: 50% 0%; } 
+            50% { background-position: 50% 20%; } 
+            100% { background-position: 50% 0%; } 
+        }
+        
+        /* CONTAINER LOCK SYSTEM */
+        .container-lock {
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            overflow-x: hidden;
+        }
+        
+        .app-container { 
+            width: 100%;
+            height: 100vh;
+            position: relative; 
+            display: flex; 
+            flex-direction: column; 
+            color: white; 
+            background: rgba(0, 0, 0, 0.8); 
+            box-shadow: 0 0 30px rgba(138, 43, 226, 0.2); 
+            overflow: hidden; 
+        }
+
+        /* MEDIA QUERIES FOR ALL DEVICES */
+        /* Tablet and larger phones */
+        @media (min-width: 415px) and (max-width: 768px) {
+            .app-container {
+                max-width: 100%;
+                border-radius: 0;
+            }
+            
+            .image-container {
+                height: 60vh !important;
+            }
+            
+            .glass-card {
+                padding: 25px !important;
+            }
+            
+            .action-btn {
+                padding: 18px !important;
+                font-size: 1.1rem !important;
+            }
+        }
+
+        /* Desktop */
+        @media (min-width: 769px) {
+            .app-container {
+                max-width: 414px;
+                height: 90vh;
+                border-radius: 20px;
+            }
+        }
+
+        /* Small phones */
+        @media (max-width: 320px) {
+            .container-lock {
+                min-width: 320px;
+            }
+            
+            .header-title {
+                font-size: 1rem !important;
+            }
+            
+            .glass-card {
+                padding: 15px !important;
+            }
+            
+            .action-btn {
+                padding: 12px !important;
+                font-size: 0.9rem !important;
+            }
+            
+            .terminal-log {
+                height: 100px !important;
+                font-size: 0.7rem !important;
+            }
+        }
+
+        /* High DPI devices */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .app-container {
+                transform: scale(1);
+                transform-origin: top center;
+            }
+        }
+
+        /* Short screens */
+        @media (max-height: 700px) {
+            .image-container {
+                height: 45vh !important;
+            }
+            
+            .terminal-log {
+                height: 80px !important;
+            }
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp { 
+            from { opacity: 0; transform: translateY(20px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+        
+        .anim-element { 
+            opacity: 0; 
+            animation: fadeInUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; 
+        }
+        
+        .delay-1 { animation-delay: 0.1s; } 
+        .delay-2 { animation-delay: 0.2s; } 
+        .delay-3 { animation-delay: 0.3s; }
+
+        /* Header */
+        header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 5% 5% 3%;
+            flex-shrink: 0; 
+            z-index: 50; 
+        }
+        
+        .header-title { 
+            font-family: 'Orbitron', sans-serif; 
+            font-size: 1.2rem; 
+            font-weight: 800; 
+            letter-spacing: 1px; 
+            color: var(--accent-pink); 
+            text-shadow: 0 0 10px rgba(255, 0, 80, 0.3); 
+        }
+        
+        .icon-btn { 
+            background: rgba(255,255,255,0.1); 
+            width: 40px; 
+            height: 40px; 
+            border-radius: 50%; 
+            border: none; 
+            color: #eee; 
+            font-size: 1.1rem; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            cursor: pointer; 
+            backdrop-filter: blur(5px); 
+            transition: 0.3s; 
+            text-decoration: none; 
+        }
+        
+        .icon-btn:active { 
+            transform: scale(0.9); 
+        }
+
+        /* Content */
+        .main-content { 
+            flex: 1; 
+            overflow-y: auto; 
+            overflow-x: hidden; 
+            padding: 3% 5% 15%;
+        }
+        
+        .glass-card { 
+            background: rgba(30, 30, 40, 0.6); 
+            backdrop-filter: blur(10px); 
+            border-radius: 20px; 
+            padding: 20px; 
+            border: 1px solid rgba(255,255,255,0.08); 
+            margin-bottom: 20px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
+        }
+
+        /* Image Display Area */
+        .image-container {
+            width: 100%;
+            height: 50vh;
+            background: #000;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .result-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: filter 0.3s ease;
+        }
+
+        /* Blur Effect */
+        .result-image.blurred {
+            filter: blur(20px) brightness(0.5);
+        }
+
+        .blur-overlay {
+            position: absolute;
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%;
+            display: flex; 
+            flex-direction: column;
+            align-items: center; 
+            justify-content: center;
+            z-index: 10;
+            background: rgba(0,0,0,0.3);
+            pointer-events: none;
+        }
+        
+        .blur-overlay.hidden { 
+            display: none; 
+        }
+
+        .eye-icon {
+            font-size: 3rem;
+            color: rgba(255,255,255,0.8);
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px #000;
+        }
+
+        /* Controls */
+        .controls-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .action-btn {
+            width: 100%; 
+            padding: 15px;
+            background: linear-gradient(135deg, #8A2BE2, #a29bfe);
+            border: none; 
+            border-radius: 12px;
+            color: white; 
+            font-family: 'Orbitron', sans-serif; 
+            font-weight: 700;
+            font-size: 1rem; 
+            cursor: pointer; 
+            transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(255, 0, 80, 0.3);
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 8px;
+        }
+        
+        .action-btn:active { 
+            transform: scale(0.98); 
+        }
+        
+        .action-btn:disabled { 
+            opacity: 0.6; 
+            cursor: not-allowed; 
+        }
+
+        .secondary-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: none;
+        }
+        
+        .secondary-btn:hover { 
+            background: rgba(255,255,255,0.15); 
+        }
+
+        .toggle-switch {
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between;
+            background: rgba(0,0,0,0.3); 
+            padding: 10px 15px; 
+            border-radius: 10px;
+            margin-bottom: 15px; 
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .toggle-label { 
+            font-size: 0.9rem; 
+            color: #ccc; 
+        }
+        
+        /* Switch Styling */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #333;
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--accent-pink);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        /* Loading */
+        .loader {
+            width: 40px; 
+            height: 40px;
+            border: 4px solid var(--accent-pink);
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: none;
+            position: absolute;
+            z-index: 5;
+        }
+        
+        @keyframes spin { 
+            0% { transform: rotate(0deg); } 
+            100% { transform: rotate(360deg); } 
+        }
+
+        /* Terminal Log */
+        .terminal-log { 
+            background: #0a0a0a; 
+            border: 1px solid #333; 
+            border-radius: 12px; 
+            padding: 15px; 
+            font-family: 'Courier Prime', monospace; 
+            font-size: 0.75rem; 
+            height: 120px; 
+            overflow-y: auto; 
+            color: var(--accent-pink); 
+            margin-top: 20px; 
+        }
+        
+        .log-line { 
+            margin-bottom: 5px; 
+            border-bottom: 1px solid rgba(255,255,255,0.05); 
+            padding-bottom: 2px; 
+        }
+
+        /* Navbar & Sidebar */
+        .navbar { 
+            position: fixed; 
+            bottom: 0; 
+            width: 100%; 
+            background: #080808; 
+            display: flex; 
+            justify-content: space-around; 
+            padding: 4% 0;
+            border-top: 1px solid #222; 
+            z-index: 1000; 
+        }
+        
+        .navbar::before { 
+            content: ''; 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 1px; 
+            background: linear-gradient(90deg, transparent, #8A2BE2, transparent); 
+            opacity: 0.6; 
+        }
+        
+        .nav-item { 
+            font-size: 1.3rem; 
+            color: #555; 
+            cursor: pointer; 
+            transition: 0.3s; 
+            position: relative; 
+            width: 50px; 
+            height: 40px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            text-decoration: none; 
+        }
+        
+        .nav-item.active { 
+            color: #fff; 
+        }
+        
+        .nav-item.active::after { 
+            content: ''; 
+            position: absolute; 
+            bottom: 0; 
+            width: 4px; 
+            height: 4px; 
+            background: #fff; 
+            border-radius: 50%; 
+            box-shadow: 0 0 8px #fff; 
+        }
+
+        .sidebar { 
+            position: fixed; 
+            top: 0; 
+            left: -100%; 
+            width: 100%;
+            max-width: var(--sidebar-width);
+            height: 100%; 
+            background: #000; 
+            z-index: 999; 
+            transition: left 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+            border-right: 1px solid #333; 
+            display: flex; 
+            flex-direction: column; 
+            box-shadow: 10px 0 30px rgba(0,0,0,0.8); 
+        }
+        
+        .sidebar.active { 
+            left: 0; 
+        }
+        
+        .sidebar-header { 
+            height: 25vh;
+            min-height: 160px;
+            background-image: url('https://files.catbox.moe/o9hswi.jpg'); 
+            background-size: cover; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: flex-end; 
+            padding: 5%;
+            border-bottom: 2px solid #fff; 
+            position: relative; 
+        }
+        
+        .sidebar-header::after { 
+            content: ''; 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.5); 
+            z-index: 0; 
+        }
+        
+        .sidebar-title { 
+            position: relative; 
+            z-index: 1; 
+            color: white; 
+            font-family: 'Orbitron'; 
+            font-weight: 700; 
+            font-size: 1.5rem; 
+        }
+        
+        .sidebar-menu { 
+            padding: 5% 0; 
+        }
+        
+        .sidebar-item { 
+            display: flex; 
+            align-items: center; 
+            padding: 4% 8%; 
+            color: #fff; 
+            font-family: 'Courier Prime'; 
+            text-decoration: none; 
+            transition: 0.2s; 
+        }
+        
+        .sidebar-item:hover { 
+            background: rgba(255,255,255,0.05); 
+            padding-left: 10%; 
+        }
+        
+        .sidebar-item i { 
+            width: 25px; 
+            margin-right: 15px; 
+            text-align: center; 
+        }
+        
+        .overlay-backdrop { 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100vw; 
+            height: 100vh; 
+            background: rgba(0,0,0,0.7); 
+            backdrop-filter: blur(3px); 
+            z-index: 998; 
+            opacity: 0; 
+            visibility: hidden; 
+            transition: 0.3s; 
+        }
+        
+        .overlay-backdrop.active { 
+            opacity: 1; 
+            visibility: visible; 
+        }
+
+        /* Toast */
+        .toast { 
+            position: fixed; 
+            bottom: 130px; 
+            left: 50%; 
+            transform: translateX(-50%) translateY(20px); 
+            background: rgba(30, 30, 40, 0.95); 
+            border: 1px solid var(--accent-pink); 
+            padding: 12px 20px; 
+            border-radius: 50px; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            color: #fff; 
+            font-weight: 600; 
+            opacity: 0; 
+            pointer-events: none; 
+            transition: 0.3s; 
+            z-index: 2000; 
+            box-shadow: 0 5px 15px rgba(255, 0, 80, 0.3); 
+        }
+        
+        .toast.show { 
+            opacity: 1; 
+            transform: translateX(-50%) translateY(0); 
+        }
+        
+        .api-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            margin-top: 10px;
+            color: #aaa;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ff4444;
+        }
+        
+        .status-dot.active {
+            background: #00ff88;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container-lock">
+        <div class="overlay-backdrop" onclick="toggleSidebar()"></div>
+
+        <div class="sidebar" id="mainSidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">Tokatsu</div>
+            </div>
+            <div class="sidebar-menu">
+                <a href="/myinfo" class="sidebar-item"><i class="fa-solid fa-circle-info"></i> My Info</a>
+                <a href="/dashboard" class="sidebar-item"><i class="fa-solid fa-house"></i> Dashboard</a>
+                <a href="/execution" class="sidebar-item"><i class="fa-solid fa-bug"></i> Attack Menu</a>
+            </div>
+        </div>
+
+        <div class="app-container">
+            <header>
+                <a href="/dashboard" class="icon-btn"><i class="fa-solid fa-arrow-left"></i></a>
+                <div class="header-title">NSFW</div>
+                <button class="icon-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+            </header>
+
+            <div class="main-content">
+                
+                <div class="glass-card anim-element delay-1">
+                    <div class="toggle-switch">
+                        <span class="toggle-label"><i class="fa-solid fa-eye-slash"></i> Auto-Blur (Safe Mode)</span>
+                        <label class="switch">
+                            <input type="checkbox" id="blurToggle" checked onchange="toggleBlurState()">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="image-container" id="imageContainer" onclick="toggleImageReveal()">
+                        <div class="loader" id="loader"></div>
+                        
+                        <img src="https://via.placeholder.com/600x800/222/555?text=Ready+To+Generate" class="result-image" id="resultImage">
+                        
+                        <div class="blur-overlay" id="blurOverlay">
+                            <i class="fa-solid fa-eye-slash eye-icon"></i>
+                            <span style="font-family:'Orbitron'; font-size:0.8rem;">Tap to Reveal</span>
+                        </div>
+                    </div>
+
+                    <div class="controls-grid">
+                        <button class="action-btn" onclick="generateWithRetry()" id="genBtn">
+                            <i class="fa-solid fa-dice"></i> GENERATE
+                        </button>
+                        <button class="action-btn secondary-btn" onclick="downloadImage()" id="downloadBtn">
+                            <i class="fa-solid fa-download"></i> SAVE
+                        </button>
+                    </div>
+                    
+                    <div class="api-status">
+                        <div class="status-dot" id="apiStatus"></div>
+                        <span id="apiStatusText">API Status: Checking...</span>
+                    </div>
+                </div>
+
+                <div class="terminal-log anim-element delay-2" id="log">
+                    <div class="log-line">> System Initialized...</div>
+                    <div class="log-line" style="color: #aaa;">> Warning: Adult Content Module Loaded.</div>
+                    <div class="log-line">> Ready to generate NSFW content</div>
+                </div>
+
+            </div>
+
+            <nav class="navbar">
+                <a href="/dashboard" class="nav-item">
+                    <i class="fa-solid fa-house"></i>
+                </a>
+                <a href="#" class="nav-item active">
+                    <i class="fa-solid fa-fire"></i>
+                </a>
+                <a href="/execution" class="nav-item">
+                    <i class="fa-solid fa-bolt-lightning"></i>
+                </a>
+                <a href="/myinfo" class="nav-item">
+                    <i class="fa-solid fa-circle-info"></i>
+                </a>
+            </nav>
+        </div>
+
+        <div class="toast" id="toast">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span id="toast-msg">Message here</span>
+        </div>
+    </div>
+
+    <script>
+        // Sidebar
+        function toggleSidebar() {
+            document.getElementById('mainSidebar').classList.toggle('active');
+            document.querySelector('.overlay-backdrop').classList.toggle('active');
+        }
+
+        // Utils
+        const utils = {
+            log: (msg, type = '') => {
+                const log = document.getElementById('log');
+                const line = document.createElement('div');
+                line.className = 'log-line';
+                if(type === 'error') line.style.color = '#ff4444';
+                if(type === 'success') line.style.color = '#00ff88';
+                if(type === 'warning') line.style.color = '#ffaa00';
+                if(type === 'info') line.style.color = '#00aaff';
+                line.innerText = `> ${msg}`;
+                log.appendChild(line);
+                log.scrollTop = log.scrollHeight;
+            },
+            toast: (msg, type = 'info') => {
+                const t = document.getElementById('toast');
+                const icon = t.querySelector('i');
+                const msgSpan = document.getElementById('toast-msg');
+                
+                // Set icon based on type
+                if (type === 'error') {
+                    icon.className = 'fa-solid fa-circle-xmark';
+                    t.style.borderColor = '#ff4444';
+                } else if (type === 'success') {
+                    icon.className = 'fa-solid fa-circle-check';
+                    t.style.borderColor = '#00ff88';
+                } else if (type === 'warning') {
+                    icon.className = 'fa-solid fa-triangle-exclamation';
+                    t.style.borderColor = '#ffaa00';
+                } else {
+                    icon.className = 'fa-solid fa-circle-info';
+                    t.style.borderColor = '#00aaff';
+                }
+                
+                msgSpan.innerText = msg;
+                t.classList.add('show');
+                setTimeout(() => t.classList.remove('show'), 3000);
+            },
+            updateApiStatus: (status) => {
+                const statusDot = document.getElementById('apiStatus');
+                const statusText = document.getElementById('apiStatusText');
+                
+                if (status === 'connected') {
+                    statusDot.className = 'status-dot active';
+                    statusText.innerText = 'API Status: Connected';
+                    statusText.style.color = '#00ff88';
+                } else if (status === 'error') {
+                    statusDot.className = 'status-dot';
+                    statusText.innerText = 'API Status: Error - Using Fallback';
+                    statusText.style.color = '#ff4444';
+                } else {
+                    statusDot.className = 'status-dot';
+                    statusText.innerText = 'API Status: Checking...';
+                    statusText.style.color = '#ffaa00';
+                }
+            }
+        };
+
+        // State
+        let isBlurEnabled = true;
+        let currentImageUrl = "";
+        let retryCount = 0;
+        const MAX_RETRIES = 3;
+
+        // Functions
+        function toggleBlurState() {
+            isBlurEnabled = document.getElementById('blurToggle').checked;
+            applyBlur();
+            utils.log(`Safe Mode: ${isBlurEnabled ? 'ON' : 'OFF'}`, 'info');
+        }
+
+        function applyBlur() {
+            const img = document.getElementById('resultImage');
+            const overlay = document.getElementById('blurOverlay');
+            
+            if (isBlurEnabled && currentImageUrl && !currentImageUrl.includes('placeholder')) {
+                img.classList.add('blurred');
+                overlay.classList.remove('hidden');
+            } else {
+                img.classList.remove('blurred');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        function toggleImageReveal() {
+            // Jika diklik saat blur aktif, matikan blur sementara
+            if (isBlurEnabled) {
+                const img = document.getElementById('resultImage');
+                const overlay = document.getElementById('blurOverlay');
+                
+                if (img.classList.contains('blurred')) {
+                    img.classList.remove('blurred');
+                    overlay.classList.add('hidden');
+                    utils.log("Image revealed temporarily", 'info');
+                } else {
+                    img.classList.add('blurred');
+                    overlay.classList.remove('hidden');
+                    utils.log("Image blurred for safety", 'info');
+                }
+            }
+        }
+
+        async function generateNSFW() {
+            const btn = document.getElementById('genBtn');
+            const loader = document.getElementById('loader');
+            const img = document.getElementById('resultImage');
+            const downloadBtn = document.getElementById('downloadBtn');
+            
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> LOADING...';
+            loader.style.display = 'block';
+            img.style.opacity = '0.5';
+            downloadBtn.disabled = true;
+            
+            utils.log("Requesting NSFW image from API...", 'info');
+            utils.updateApiStatus('checking');
+
+            try {
+                const response = await fetch('/api/nsfw/random');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+
+                if (data.success && data.image) {
+                    currentImageUrl = data.image;
+                    
+                    // Preload image dengan timeout
+                    await new Promise((resolve, reject) => {
+                        const newImg = new Image();
+                        newImg.onload = () => resolve(newImg);
+                        newImg.onerror = () => reject(new Error("Failed to load image"));
+                        newImg.src = data.image;
+                        
+                        // Timeout untuk image loading
+                        setTimeout(() => reject(new Error("Image loading timeout")), 15000);
+                    });
+                    
+                    img.src = data.image;
+                    img.style.opacity = '1';
+                    loader.style.display = 'none';
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa-solid fa-dice"></i> GENERATE';
+                    downloadBtn.disabled = false;
+                    
+                    // Reset retry count on success
+                    retryCount = 0;
+                    
+                    // Re-apply blur rule on new image
+                    applyBlur();
+                    
+                    utils.log("Image loaded successfully from API", 'success');
+                    utils.toast("New Image Generated!", 'success');
+                    utils.updateApiStatus('connected');
+                    
+                } else {
+                    throw new Error(data.error || "Invalid API response");
+                }
+
+            } catch (error) {
+                console.error('Generation Error:', error);
+                utils.log(`API Error: ${error.message}`, 'error');
+                utils.toast("API Error - Trying fallback", 'warning');
+                
+                // Try fallback local image
+                try {
+                    const fallbackImages = [
+                        'https://i.imgur.com/6VYXp6v.jpeg',
+                        'https://i.imgur.com/9E8aYWV.jpeg',
+                        'https://i.imgur.com/3Q7Y4zv.jpeg'
+                    ];
+                    
+                    const randomIndex = Math.floor(Math.random() * fallbackImages.length);
+                    currentImageUrl = fallbackImages[randomIndex];
+                    
+                    img.src = currentImageUrl;
+                    img.style.opacity = '1';
+                    loader.style.display = 'none';
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa-solid fa-dice"></i> GENERATE';
+                    downloadBtn.disabled = false;
+                    
+                    applyBlur();
+                    
+                    utils.log("Using fallback image", 'warning');
+                    utils.toast("Using fallback image", 'warning');
+                    utils.updateApiStatus('error');
+                    
+                } catch (fallbackError) {
+                    utils.log("All image sources failed", 'error');
+                    utils.toast("All image sources failed", 'error');
+                    
+                    loader.style.display = 'none';
+                    img.style.opacity = '1';
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa-solid fa-dice"></i> GENERATE';
+                    downloadBtn.disabled = true;
+                }
+            }
+        }
+
+        async function generateWithRetry() {
+            if (retryCount >= MAX_RETRIES) {
+                utils.log("Max retries reached. Please try again later.", 'error');
+                utils.toast("Max retries reached", 'error');
+                return;
+            }
+            
+            retryCount++;
+            utils.log(`Attempt ${retryCount}/${MAX_RETRIES}...`, 'info');
+            await generateNSFW();
+        }
+
+        function downloadImage() {
+            if (!currentImageUrl || currentImageUrl.includes('placeholder')) {
+                utils.toast("No image to download!", 'error');
+                return;
+            }
+            
+            utils.toast("Downloading image...", 'info');
+            utils.log("Starting download process...", 'info');
+            
+            try {
+                const a = document.createElement('a');
+                a.href = currentImageUrl;
+                a.download = `nsfw_${Date.now()}.jpg`;
+                a.target = '_blank';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                utils.log("Download initiated successfully", 'success');
+            } catch (error) {
+                utils.log(`Download failed: ${error.message}`, 'error');
+                utils.toast("Download failed - Try again", 'error');
+                
+                // Fallback: open in new tab
+                window.open(currentImageUrl, '_blank');
+            }
+        }
+
+        // Test API connection on load
+        async function testApiConnection() {
+            try {
+                const response = await fetch('/api/nsfw/random');
+                if (response.ok) {
+                    utils.updateApiStatus('connected');
+                    utils.log("API connection test: SUCCESS", 'success');
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                utils.updateApiStatus('error');
+                utils.log("API connection test: FAILED - Using fallbacks", 'warning');
+            }
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            applyBlur(); // Set initial state
+            testApiConnection(); // Test API on load
+            
+            // Add click event to nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+        });
+
+    </script>
+</body>
+</html>

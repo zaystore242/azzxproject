@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>YouTube - Tokatsu</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@400;500;600;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-purple: #8A2BE2;
+            --secondary-purple: #4c1d95;
+            --accent-cyan: #00f3ff;
+            --accent-red: #ff0050;
+            --glass-bg: rgba(20, 20, 30, 0.7);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --sidebar-width: 280px; /* Disesuaikan agar pas di container mobile */
+            --header-height: 70px;
+            --nav-height: 70px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Rajdhani', sans-serif; -webkit-tap-highlight-color: transparent; outline: none; }
+        
+        body { 
+            background-color: #050505; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            /* Background Desktop */
+            background: radial-gradient(circle at 50% 20%, #1a0b2e 0%, #000 60%); 
+            background-size: 200% 200%; 
+            animation: bgPulse 10s ease infinite; 
+            overflow: hidden; 
+        }
+        
+        @keyframes bgPulse { 0% { background-position: 50% 0%; } 50% { background-position: 50% 20%; } 100% { background-position: 50% 0%; } }
+
+        /* --- CONTAINER RESPONSIVE --- */
+        .app-container { 
+            width: 100%; 
+            height: 100dvh; /* Fullscreen di HP */
+            position: relative; 
+            display: flex; 
+            flex-direction: column; 
+            color: white; 
+            background: rgba(10, 10, 15, 0.95); 
+            overflow: hidden; /* Penting untuk absolute positioning anak elemen */
+        }
+
+        /* Tampilan Desktop (> 768px) */
+        @media (min-width: 768px) {
+            .app-container {
+                width: 400px; /* Lebar tetap seperti HP */
+                height: 85vh;
+                max-height: 900px;
+                border-radius: 30px; /* Sudut melengkung */
+                border: 1px solid rgba(255, 255, 255, 0.15);
+                box-shadow: 0 0 50px rgba(138, 43, 226, 0.3);
+            }
+            /* Scrollbar Desktop */
+            .main-content::-webkit-scrollbar { width: 5px; }
+            .main-content::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        }
+
+        /* ANIMATIONS */
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .anim-element { opacity: 0; animation: fadeInUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; }
+        .delay-1 { animation-delay: 0.1s; } .delay-2 { animation-delay: 0.2s; } .delay-3 { animation-delay: 0.3s; }
+        
+        /* HEADER */
+        header { 
+            height: var(--header-height);
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 0 20px; flex-shrink: 0; z-index: 50; 
+            background: rgba(0,0,0,0.2); backdrop-filter: blur(5px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+        .header-title { font-family: 'Orbitron', sans-serif; font-size: 1.2rem; font-weight: 800; letter-spacing: 1px; background: linear-gradient(to right, #fff, #a29bfe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 10px rgba(138, 43, 226, 0.3); }
+        .icon-btn { background: rgba(255,255,255,0.08); width: 40px; height: 40px; border-radius: 50%; border: none; color: #eee; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s; text-decoration: none; }
+        .icon-btn:active { transform: scale(0.9); background: rgba(255,255,255,0.2); }
+
+        /* CONTENT */
+        .main-content { 
+            flex: 1; 
+            overflow-y: auto; 
+            overflow-x: hidden; 
+            padding: 20px 20px 100px 20px; /* Padding bawah lebih besar untuk navbar */
+        }
+        .glass-card { background: rgba(30, 30, 45, 0.5); backdrop-filter: blur(10px); border-radius: 16px; padding: 20px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        
+        /* INPUT */
+        .input-group { position: relative; margin-bottom: 20px; }
+        .input-box { width: 100%; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 14px 45px 14px 14px; color: #fff; font-size: 0.95rem; transition: 0.3s; }
+        .input-box:focus { border-color: var(--accent-red); box-shadow: 0 0 15px rgba(255, 0, 80, 0.2); }
+        .input-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #888; }
+        
+        /* BUTTON */
+        .action-btn { width: 100%; padding: 14px; background: linear-gradient(135deg, #ff0050, #990030); border: none; border-radius: 10px; color: white; font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: 0.3s; box-shadow: 0 5px 15px rgba(255, 0, 80, 0.3); position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .action-btn:active { transform: scale(0.98); }
+        .action-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        /* LIST & RESULTS */
+        .yt-list { display: flex; flex-direction: column; gap: 12px; }
+        .yt-item { display: flex; align-items: center; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); padding: 10px; border-radius: 12px; transition: 0.3s; cursor: pointer; }
+        .yt-item:hover { background: rgba(255, 255, 255, 0.08); border-color: var(--accent-red); }
+        .yt-item:active { transform: scale(0.98); }
+        .yt-thumb { width: 80px; height: 60px; border-radius: 8px; object-fit: cover; margin-right: 15px; border: 1px solid rgba(255,255,255,0.1); }
+        .yt-info { flex: 1; overflow: hidden; }
+        .yt-title { font-weight: 700; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; margin-bottom: 3px; }
+        .yt-channel { font-size: 0.75rem; color: #aaa; font-family: 'Courier Prime'; }
+        .yt-arrow { color: var(--accent-red); font-size: 1rem; margin-right: 5px; }
+
+        /* DETAIL CARD */
+        .detail-card { display: none; flex-direction: column; }
+        .video-large-thumb { width: 100%; aspect-ratio: 16/9; border-radius: 12px; object-fit: cover; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 5px 20px rgba(0,0,0,0.5); }
+        .detail-meta { text-align: center; margin-bottom: 20px; }
+        .detail-title { font-size: 1rem; font-weight: 700; margin-bottom: 5px; color: #fff; line-height: 1.4; }
+        .detail-channel { color: var(--accent-red); font-family: 'Courier Prime'; font-size: 0.85rem; }
+        .stats-grid { display: flex; justify-content: space-between; background: rgba(0,0,0,0.3); padding: 12px; border-radius: 12px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05); }
+        .stat-item { text-align: center; width: 33%; }
+        .stat-val { display: block; font-weight: 700; color: #fff; font-size: 0.85rem; }
+        .stat-label { font-size: 0.65rem; color: #888; text-transform: uppercase; margin-top: 4px; }
+        
+        .dl-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        .dl-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; color: #fff; text-decoration: none; display: flex; flex-direction: column; align-items: center; transition: 0.3s; cursor: pointer; }
+        .dl-btn:active { background: rgba(255,255,255,0.1); transform: scale(0.95); }
+        .dl-btn i { font-size: 1.5rem; margin-bottom: 5px; color: var(--accent-red); }
+        .dl-btn span { font-size: 0.9rem; font-weight: 600; }
+        .dl-btn small { font-size: 0.7rem; color: #888; }
+
+        /* LOGS */
+        .terminal-log { background: #080808; border: 1px solid #222; border-radius: 12px; padding: 12px; font-family: 'Courier Prime', monospace; font-size: 0.7rem; height: 100px; overflow-y: auto; color: #00ff88; margin-top: 15px; }
+        .log-line { margin-bottom: 4px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+        .log-error { color: #ff0055; } .log-info { color: #888; }
+
+        /* NAVBAR (CONTAINED) */
+        .navbar { 
+            position: absolute; /* Terkunci di dalam container */
+            bottom: 0; left: 0; width: 100%; 
+            height: var(--nav-height);
+            background: rgba(8, 8, 10, 0.98); 
+            display: flex; justify-content: space-around; align-items: center; 
+            border-top: 1px solid rgba(255,255,255,0.05); 
+            z-index: 100;
+        }
+        .nav-item { font-size: 1.2rem; color: #555; cursor: pointer; transition: 0.3s; position: relative; width: 50px; height: 100%; display: flex; justify-content: center; align-items: center; text-decoration: none; }
+        .nav-item.active { color: #fff; }
+        .nav-item.active::after { content: ''; position: absolute; top: 0; width: 30px; height: 3px; background: var(--accent-red); border-radius: 0 0 10px 10px; box-shadow: 0 5px 15px var(--accent-red); }
+
+        /* SIDEBAR (CONTAINED) */
+        .sidebar { 
+            position: absolute; /* Terkunci di dalam container */
+            top: 0; left: -100%; width: var(--sidebar-width); height: 100%; 
+            background: #0b0b0b; z-index: 999; 
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+            border-right: 1px solid #222; display: flex; flex-direction: column; 
+            box-shadow: 10px 0 50px rgba(0,0,0,0.5); 
+        }
+        .sidebar.active { left: 0; }
+        .sidebar-header { height: 150px; background-image: url('https://files.catbox.moe/o9hswi.jpg'); background-size: cover; display: flex; flex-direction: column; justify-content: flex-end; padding: 15px; position: relative; }
+        .sidebar-header::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.9), transparent); z-index: 0; }
+        .sidebar-title, .sidebar-subtitle { position: relative; z-index: 1; color: white; }
+        .sidebar-title { font-family: 'Orbitron', sans-serif; font-size: 1.3rem; font-weight: 700; }
+        .sidebar-subtitle { font-family: 'Rajdhani'; font-size: 1rem; color: #ccc; }
+        .sidebar-menu { padding: 10px 0; }
+        .sidebar-item { display: flex; align-items: center; padding: 12px 20px; color: #ccc; font-family: 'Rajdhani'; font-size: 1.1rem; text-decoration: none; transition: 0.2s; border-left: 3px solid transparent; }
+        .sidebar-item:hover { background: rgba(255,255,255,0.03); color: #fff; padding-left: 25px; }
+        .sidebar-item i { width: 30px; margin-right: 5px; text-align: center; color: var(--accent-red); }
+        
+        .overlay-backdrop { 
+            position: absolute; inset: 0; /* Full container */
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(2px); 
+            z-index: 998; opacity: 0; visibility: hidden; transition: 0.3s; 
+        }
+        .overlay-backdrop.active { opacity: 1; visibility: visible; }
+
+        /* TOAST (CONTAINED) */
+        .toast { 
+            position: absolute; bottom: 90px; left: 50%; 
+            transform: translateX(-50%) translateY(20px); 
+            background: rgba(20, 20, 25, 0.95); border: 1px solid var(--accent-red); 
+            padding: 10px 20px; border-radius: 50px; display: flex; align-items: center; gap: 10px; 
+            color: #fff; font-size: 0.9rem; font-weight: 600; 
+            opacity: 0; visibility: hidden; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            z-index: 2000; width: max-content; max-width: 90%;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+        .toast.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+        .toast i { color: var(--accent-red); }
+
+        /* LOADING */
+        .loading-spinner { text-align: center; color: var(--accent-red); font-size: 2rem; padding: 20px; display: none; }
+        .loading-spinner i { animation: spin 1s infinite linear; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <div class="overlay-backdrop" onclick="toggleSidebar()"></div>
+
+        <div class="sidebar" id="mainSidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">Tokatsu</div>
+                <div class="sidebar-subtitle">Free Version</div>
+            </div>
+            <div class="sidebar-menu">
+                <a href="/myinfo" class="sidebar-item"><i class="fa-solid fa-circle-info"></i> My Info</a>
+                <a href="/dashboard" class="sidebar-item"><i class="fa-solid fa-house"></i> Dashboard</a>
+                <a href="/execution" class="sidebar-item"><i class="fa-solid fa-bug"></i> Attack Menu</a>
+            </div>
+        </div>
+
+        <header>
+            <a href="/dashboard" class="icon-btn"><i class="fa-solid fa-arrow-left"></i></a>
+            <div class="header-title">YouTube</div>
+            <button class="icon-btn" onclick="toggleSidebar()"><i class="fa-solid fa-bars"></i></button>
+        </header>
+
+        <div class="main-content">
+            
+            <div class="glass-card anim-element delay-1">
+                <div class="input-group">
+                    <input type="text" class="input-box" id="yt-query" placeholder="Search song or paste link...">
+                    <i class="fa-solid fa-search input-icon"></i>
+                </div>
+                
+                <button class="action-btn" onclick="searchYouTube()" id="searchBtn">
+                    <i class="fa-brands fa-youtube"></i> CARI VIDEO
+                </button>
+            </div>
+
+            <div class="loading-spinner" id="loading">
+                <i class="fa-solid fa-circle-notch"></i>
+            </div>
+
+            <div class="yt-list" id="yt-list">
+                </div>
+
+            <div class="glass-card detail-card" id="detail-card">
+                <img src="" class="video-large-thumb" id="d-thumb">
+                
+                <div class="detail-meta">
+                    <div class="detail-title" id="d-title">Judul Video</div>
+                    <div class="detail-channel" id="d-channel">Nama Channel</div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-val" id="d-views">0</span>
+                        <span class="stat-label">Views</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-val" id="d-duration">0:00</span>
+                        <span class="stat-label">Durasi</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-val" id="d-date">N/A</span>
+                        <span class="stat-label">Upload</span>
+                    </div>
+                </div>
+
+                <div class="dl-grid">
+                    <div class="dl-btn" id="btn-download-audio">
+                        <i class="fa-solid fa-music"></i>
+                        <span>Download MP3</span>
+                        <small>Klik untuk mengunduh</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="terminal-log anim-element delay-3" id="log">
+                <div class="log-line">> System Initialized...</div>
+                <div class="log-line log-info">> Ready to fetch.</div>
+            </div>
+
+        </div>
+
+        <nav class="navbar">
+            <a href="/dashboard" class="nav-item">
+                <i class="fa-solid fa-house"></i>
+            </a>
+            <a href="#" class="nav-item active">
+                <i class="fa-brands fa-youtube"></i>
+            </a>
+            <a href="/execution" class="nav-item">
+                <i class="fa-solid fa-bolt-lightning"></i>
+            </a>
+            <a href="/myinfo" class="nav-item">
+                <i class="fa-solid fa-circle-info"></i>
+            </a>
+        </nav>
+
+        <div class="toast" id="toast">
+            <i class="fa-solid fa-info-circle"></i>
+            <span id="toast-msg">Pesan disini</span>
+        </div>
+
+    </div>
+
+    <script>
+        // --- UI Logic ---
+        function toggleSidebar() {
+            document.getElementById('mainSidebar').classList.toggle('active');
+            document.querySelector('.overlay-backdrop').classList.toggle('active');
+        }
+
+        const utils = {
+            log: (msg, type = '') => {
+                const log = document.getElementById('log');
+                const line = document.createElement('div');
+                line.className = `log-line ${type === 'error' ? 'log-error' : type === 'info' ? 'log-info' : ''}`;
+                line.innerText = `> ${msg}`;
+                log.appendChild(line);
+                log.scrollTop = log.scrollHeight;
+            },
+            toast: (msg) => {
+                const t = document.getElementById('toast');
+                document.getElementById('toast-msg').innerText = msg;
+                t.classList.add('show');
+                setTimeout(() => t.classList.remove('show'), 3000);
+            },
+            loading: (state) => {
+                document.getElementById('loading').style.display = state ? 'block' : 'none';
+                document.getElementById('searchBtn').disabled = state;
+            }
+        };
+
+        let currentSelectedVideo = null;
+
+        // --- Mock Search (Replace with Real API) ---
+        async function searchYouTube() {
+            const query = document.getElementById('yt-query').value.trim();
+            const list = document.getElementById('yt-list');
+            const detailCard = document.getElementById('detail-card');
+            
+            if (!query) return utils.toast("Mohon isi kata kunci pencarian!");
+
+            list.innerHTML = '';
+            detailCard.style.display = 'none';
+            utils.loading(true);
+            
+            // SIMULASI API (Ganti dengan Fetch asli)
+            setTimeout(() => {
+                utils.loading(false);
+                utils.log(`Hasil untuk: ${query}`);
+
+                // Data Dummy
+                const mockData = [
+                    { title: "Music Video - Example 1", channel: "Artist One", thumb: "https://via.placeholder.com/320x180", duration: "3:45", ago: "1 day ago", views: "1.2M", url: "#" },
+                    { title: "Tutorial Coding Responsive", channel: "Code Master", thumb: "https://via.placeholder.com/320x180", duration: "12:30", ago: "2 days ago", views: "500K", url: "#" },
+                    { title: "Lofi Beats to Chill", channel: "Lofi Girl", thumb: "https://via.placeholder.com/320x180", duration: "Live", ago: "Now", views: "20K", url: "#" }
+                ];
+
+                if(mockData.length === 0) return utils.toast("Tidak ditemukan!");
+
+                mockData.forEach((video, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'yt-item anim-element';
+                    item.style.animationDelay = `${index * 0.1}s`;
+                    
+                    item.innerHTML = `
+                        <img src="${video.thumb}" class="yt-thumb">
+                        <div class="yt-info">
+                            <div class="yt-title">${video.title}</div>
+                            <div class="yt-channel">${video.channel} • ${video.views}</div>
+                        </div>
+                        <i class="fa-solid fa-chevron-right yt-arrow"></i>
+                    `;
+                    
+                    item.onclick = () => selectVideo(video);
+                    list.appendChild(item);
+                });
+
+            }, 1000);
+        }
+
+        // --- Select Video & Show Detail ---
+        function selectVideo(videoData) {
+            currentSelectedVideo = videoData;
+            
+            const list = document.getElementById('yt-list');
+            const detailCard = document.getElementById('detail-card');
+
+            // Hide list, show detail for cleaner UI inside small container
+            // list.style.display = 'none'; 
+            detailCard.style.display = 'flex';
+            detailCard.classList.add('anim-element');
+            
+            // Scroll to detail
+            detailCard.scrollIntoView({ behavior: 'smooth' });
+
+            // Populate Data
+            document.getElementById('d-thumb').src = videoData.thumb;
+            document.getElementById('d-title').innerText = videoData.title;
+            document.getElementById('d-channel').innerText = videoData.channel;
+            document.getElementById('d-views').innerText = videoData.views;
+            document.getElementById('d-duration').innerText = videoData.duration;
+            document.getElementById('d-date').innerText = videoData.ago;
+
+            const btnDownload = document.getElementById('btn-download-audio');
+            
+            // Replace node to clear old listeners
+            const newBtn = btnDownload.cloneNode(true);
+            btnDownload.parentNode.replaceChild(newBtn, btnDownload);
+            newBtn.onclick = () => downloadAudio(videoData.url);
+        }
+
+        // --- Mock Download ---
+        async function downloadAudio(videoUrl) {
+            utils.toast("Memulai download...");
+            const btn = document.getElementById('btn-download-audio');
+            const originalHTML = btn.innerHTML;
+            
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Processing...</span>`;
+            
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+                utils.log("Download complete (Mock)", "info");
+                utils.toast("Download Selesai!");
+            }, 2000);
+        }
+
+        document.getElementById('yt-query').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') searchYouTube();
+        });
+
+    </script>
+</body>
+</html>
